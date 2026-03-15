@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/date_symbol_data_local.dart'; // YENİ: Türkçe tarih formatları için
 import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   try {
+    // YENİ: Türkçe tarih formatlarını başlat
+    await initializeDateFormatting('tr', null);
+
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
     debugPrint('Firebase başlatılamadı: $e');
   }
+
   runApp(const MindCareApp());
 }
 
