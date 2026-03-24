@@ -1,17 +1,37 @@
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class EncryptionService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  SharedPreferences? _prefs;
+
+  // SharedPreferences'i başlat
+  Future<void> _initPrefs() async {
+    if (kIsWeb) {
+      _prefs ??= await SharedPreferences.getInstance();
+    }
+  }
 
   // Günlük şifresini güvenli depoya kaydet
   Future<void> saveDiaryPassword(String password) async {
-    await _secureStorage.write(key: 'diary_password', value: password);
+    if (kIsWeb) {
+      await _initPrefs();
+      await _prefs!.setString('diary_password', password);
+    } else {
+      await _secureStorage.write(key: 'diary_password', value: password);
+    }
   }
 
   // Günlük şifresini güvenli depodan al
   Future<String?> getDiaryPassword() async {
-    return await _secureStorage.read(key: 'diary_password');
+    if (kIsWeb) {
+      await _initPrefs();
+      return _prefs!.getString('diary_password');
+    } else {
+      return await _secureStorage.read(key: 'diary_password');
+    }
   }
 
   // Şifre ile metin şifrele
@@ -31,7 +51,6 @@ class EncryptionService {
       // IV'yi de şifreli metnin başına ekle (çözme için)
       return '${iv.base64}:${encrypted.base64}';
     } catch (e) {
-      print('Şifreleme hatası: $e');
       return plainText; // Hata durumunda orijinal metni döndür
     }
   }
@@ -58,7 +77,6 @@ class EncryptionService {
           encrypter.decrypt(Encrypted.fromBase64(encryptedBase64), iv: iv);
       return decrypted;
     } catch (e) {
-      print('Çözme hatası: $e');
       return "🔒 Şifreli içerik (şifre hatalı veya bozuk veri)";
     }
   }

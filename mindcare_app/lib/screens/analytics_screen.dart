@@ -100,7 +100,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   ...filteredResults.map((doc) {
                     final data = doc.data() as Map<String, dynamic>;
                     return _buildResultCard(data);
-                  }).toList(),
+                  }),
                 ],
               );
             },
@@ -171,9 +171,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final avgScore = totalTests > 0 ? (totalScore / totalTests).round() : 0;
     final avgPercentage =
         totalTests > 0 ? (totalPercentage / totalTests).round() : 0;
-
-    String mostCommonLevel =
-        levelCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
 
     return Row(
       children: [
@@ -295,14 +292,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.calendar_today, size: 12, color: Colors.grey),
+              const Icon(Icons.calendar_today, size: 12, color: Colors.grey),
               const SizedBox(width: 4),
               Text(
                 DateFormat('dd MMMM yyyy', 'tr').format(date),
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(width: 16),
-              Icon(Icons.star, size: 12, color: Colors.grey),
+              const Icon(Icons.star, size: 12, color: Colors.grey),
               const SizedBox(width: 4),
               Text(
                 '$score / $maxScore ($percentage%)',

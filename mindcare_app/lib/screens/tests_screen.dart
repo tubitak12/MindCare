@@ -203,7 +203,7 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Map<String, dynamic>> _questions = [];
-  Map<int, String> _answers = {};
+  final Map<int, String> _answers = {};
   int _currentQuestionIndex = 0;
   bool _isLoading = true;
   bool _testStarted = false;
@@ -239,7 +239,6 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
 
       setState(() => _isLoading = false);
     } catch (e) {
-      print('Sorular yüklenirken hata: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -338,7 +337,6 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
         ),
       );
     } catch (e) {
-      print('Sonuç kaydedilirken hata: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -401,7 +399,7 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
@@ -426,10 +424,10 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 10),
-            Text(
+            const Text(
               'Her soruyu dikkatlice okuyun ve size en uygun seçeneği işaretleyin.',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey),
+              style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 40),
             SizedBox(
@@ -507,7 +505,6 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
                 ),
                 const SizedBox(height: 24),
                 ...options.asMap().entries.map((entry) {
-                  final index = entry.key;
                   final option = entry.value;
                   final isSelected = selectedAnswer == option;
 
@@ -651,7 +648,7 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),

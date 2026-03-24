@@ -50,7 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => _playingTitle = title);
       }
     } catch (e) {
-      print('Ses çalma hatası: $e');
       _showSnackBar('Ses dosyası bulunamadı: $fileName');
     }
   }

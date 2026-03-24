@@ -15,7 +15,6 @@ class _DailyScreenState extends State<DailyScreen> {
   final _entryController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   final _passwordFormKey = GlobalKey<FormState>();
 
   final EncryptionService _encryptionService = EncryptionService();
@@ -178,6 +177,8 @@ class _DailyScreenState extends State<DailyScreen> {
 
     final diaryPassword = await _encryptionService.getDiaryPassword();
     if (diaryPassword == null) return;
+
+    if (!mounted) return;
 
     showModalBottomSheet(
       context: context,
@@ -383,8 +384,9 @@ class _DailyScreenState extends State<DailyScreen> {
                 obscureText: true,
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Şifre gerekli';
-                  if (_isFirstTime && v.length < 4)
+                  if (_isFirstTime && v.length < 4) {
                     return 'Şifre en az 4 karakter olmalı';
+                  }
                   return null;
                 },
                 decoration: const InputDecoration(
@@ -582,7 +584,7 @@ class _DailyScreenState extends State<DailyScreen> {
           Switch(
             value: _isPrivate,
             onChanged: (value) => setState(() => _isPrivate = value),
-            activeColor: const Color(0xFF72B01D),
+            activeThumbColor: const Color(0xFF72B01D),
           ),
         ],
       ),

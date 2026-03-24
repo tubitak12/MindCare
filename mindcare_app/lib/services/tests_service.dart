@@ -22,7 +22,6 @@ class TestsService {
         };
       }).toList();
     } catch (e) {
-      print('Testler yüklenirken hata: $e');
       return [];
     }
   }
@@ -47,7 +46,6 @@ class TestsService {
         };
       }).toList();
     } catch (e) {
-      print('Sorular yüklenirken hata: $e');
       return [];
     }
   }

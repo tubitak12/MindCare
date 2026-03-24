@@ -14,6 +14,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _darkModeEnabled = false;
   final String _selectedLanguage = 'Türkçe';
+  bool _isPasswordResetLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -114,34 +115,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showPasswordChangeDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Şifre Sıfırlama'),
-        content: const Text(
-            'E-posta adresinize sıfırlama bağlantısı gönderilsin mi?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final email = _authService.currentUser?.email;
-              if (email != null) {
-                await _authService.sendPasswordReset(email);
-                if (!mounted) return;
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Bağlantı gönderildi! 📧'),
-                    backgroundColor: Color(0xFF72B01D),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              }
-            },
-            child: const Text('Gönder'),
-          ),
-        ],
+      barrierDismissible: !_isPasswordResetLoading,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Şifre Sıfırlama'),
+          content: const Text(
+              'E-posta adresinize sıfırlama bağlantısı gönderilsin mi?'),
+          actions: [
+            TextButton(
+              onPressed: _isPasswordResetLoading ? null : () => Navigator.pop(context),
+              child: const Text('İptal'),
+            ),
+            ElevatedButton(
+              onPressed: _isPasswordResetLoading
+                  ? null
+                  : () async {
+                      final email = _authService.currentUser?.email;
+
+                      // Email kontrolü
+                      if (email == null || email.isEmpty) {
+                        if (mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Lütfen önce giriş yapınız!'),
+                              backgroundColor: Colors.redAccent,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                        return;
+                      }
+
+                      // Loading state başla
+                      setDialogState(() => _isPasswordResetLoading = true);
+
+                      try {
+                        // Şifre sıfırlama e-postası gönder
+                        await _authService.sendPasswordReset(email);
+
+                        if (mounted) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Sıfırlama bağlantısı $email adresine gönderildi! 📧'),
+                                backgroundColor: const Color(0xFF72B01D),
+                                behavior: SnackBarBehavior.floating,
+                                duration: const Duration(seconds: 4),
+                              ),
+                            );
+                          });
+                        }
+                      } catch (e) {
+                        // Hata durumu
+                        if (mounted) {
+                          setDialogState(() => _isPasswordResetLoading = false);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Hata: ${e.toString()}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                backgroundColor: Colors.redAccent,
+                                behavior: SnackBarBehavior.floating,
+                                duration: const Duration(seconds: 4),
+                              ),
+                            );
+                          });
+                        }
+                      }
+
+                      // Loading state kapat
+                      if (mounted) {
+                        setDialogState(() => _isPasswordResetLoading = false);
+                      }
+                    },
+              child: _isPasswordResetLoading
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text('Gönder'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -159,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
       value: value,
       onChanged: onChanged,
-      activeColor: const Color(0xFF72B01D),
+      activeThumbColor: const Color(0xFF72B01D),
     );
   }
 
@@ -278,9 +344,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (user != null) {
                   await _authService.updateDisplayName(
                       user, controller.text.trim());
-                  if (!mounted) return;
-                  setState(() {});
-                  Navigator.pop(context);
+                  if (mounted) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {});
+                      Navigator.pop(context);
+                    });
+                  }
                 }
               }
             },
