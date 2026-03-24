@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/tests_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TestsScreen extends StatefulWidget {
   const TestsScreen({super.key});
@@ -9,329 +10,741 @@ class TestsScreen extends StatefulWidget {
 }
 
 class _TestsScreenState extends State<TestsScreen> {
-  final TestsService _testsService = TestsService();
-  List<Map<String, dynamic>> _testList = [];
-  bool _isLoadingData = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTestData();
-  }
-
-  Future<void> _loadTestData() async {
-    List<Map<String, dynamic>> tests = await _testsService.getAllTests();
-    setState(() {
-      _testList = tests;
-      _isLoadingData = false;
-    });
-  }
-
-  IconData _getIconForName(String iconName) {
-    switch (iconName) {
-      case 'psychology':
-        return Icons.psychology;
-      case 'favorite':
-        return Icons.favorite;
-      case 'whatshot':
-        return Icons.whatshot;
-      case 'sentiment_satisfied':
-        return Icons.sentiment_satisfied;
-      default:
-        return Icons.help_outline;
-    }
-  }
-
-  Color _getColorFromString(String colorString) {
-    try {
-      return Color(int.parse(colorString));
-    } catch (e) {
-      return const Color(0xFF7B61FF);
-    }
-  }
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFF),
-      appBar: AppBar(
-        title: const Text('Testler'),
-        backgroundColor: const Color(0xFF7B61FF),
-      ),
-      body: _isLoadingData
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: _testList.length + 1,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, position) {
-                if (position == _testList.length) {
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF3E5F5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'Önemli Not\n\n'
-                      'Bu testler sadece bilgilendirme amaçlıdır ve profesyonel '
-                      'bir tanı yerine geçmez. Ciddi semptomlar yaşıyorsanız '
-                      'lütfen bir uzmanla görüşün.',
-                      style: TextStyle(color: Colors.black87),
-                    ),
-                  );
-                }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Ruh Halini Değerlendir',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1B4332),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Kendini daha iyi tanımak için testleri çöz',
+            style: TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 24),
 
-                final currentTest = _testList[position];
-                return Material(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.white,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor:
-                          _getColorFromString(currentTest['color']),
-                      child: Icon(_getIconForName(currentTest['icon']),
-                          color: Colors.white),
-                    ),
-                    title: Text(currentTest['title']),
-                    subtitle: Text(currentTest['subtitle']),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DynamicTestScreen(
-                            testId: currentTest['id'],
-                            testTitle: currentTest['title'],
-                            testType: currentTest['type'],
-                          ),
-                        ),
-                      );
-                    },
+          // Firebase'den testleri çek
+          StreamBuilder<QuerySnapshot>(
+            stream: _firestore.collection('tests').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.error_outline,
+                          color: Colors.red, size: 50),
+                      const SizedBox(height: 10),
+                      Text('Hata: ${snapshot.error}'),
+                    ],
                   ),
                 );
-              },
-            ),
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF72B01D)),
+                );
+              }
+
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Center(
+                  child: Column(
+                    children: [
+                      Icon(Icons.assignment_late, size: 50, color: Colors.grey),
+                      SizedBox(height: 10),
+                      Text('Henüz test eklenmemiş',
+                          style: TextStyle(color: Colors.grey)),
+                      SizedBox(height: 10),
+                      Text('Firebase Cloud Firestore\'a test ekleyin',
+                          style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                );
+              }
+
+              final tests = snapshot.data!.docs;
+              return Column(
+                children: tests.map((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _buildTestCard(
+                      context,
+                      data['emoji'] ?? '📝',
+                      data['title'] ?? 'Test',
+                      data['description'] ?? 'Açıklama',
+                      '${data['questionCount'] ?? 0} soru • ${data['duration'] ?? '?'} dk',
+                      doc.id,
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
-}
 
-class DynamicTestScreen extends StatefulWidget {
-  final String testId;
-  final String testTitle;
-  final String testType;
-
-  const DynamicTestScreen({
-    super.key,
-    required this.testId,
-    required this.testTitle,
-    required this.testType,
-  });
-
-  @override
-  State<DynamicTestScreen> createState() => _DynamicTestScreenState();
-}
-
-class _DynamicTestScreenState extends State<DynamicTestScreen> {
-  final TestsService _testsService = TestsService();
-  List<Map<String, dynamic>> _questionList = [];
-  List<int?> _answerList = [];
-  int _currentQuestionIndex = 0;
-  bool _isLoadingQuestions = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadQuestionData();
-  }
-
-  Future<void> _loadQuestionData() async {
-    List<Map<String, dynamic>> questions =
-        await _testsService.getTestQuestions(widget.testId);
-    setState(() {
-      _questionList = questions;
-      _answerList = List<int?>.filled(questions.length, null);
-      _isLoadingQuestions = false;
-    });
-  }
-
-  String _getLevelFromScore(int score) {
-    switch (widget.testType) {
-      case 'anxiety':
-        return TestsService.getAnxietyLevel(score);
-      case 'depression':
-        return TestsService.getDepressionLevel(score);
-      case 'stress':
-        return TestsService.getStressLevel(score);
-      case 'wellbeing':
-        return TestsService.getWellbeingLevel(score);
-      default:
-        return 'Değerlendirildi';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoadingQuestions) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF8FBFF),
-        appBar: AppBar(
-          title: Text(widget.testTitle),
-          backgroundColor: const Color(0xFF7B61FF),
-        ),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (_questionList.isEmpty) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF8FBFF),
-        appBar: AppBar(
-          title: Text(widget.testTitle),
-          backgroundColor: const Color(0xFF7B61FF),
-        ),
-        body: const Center(
-          child: Text('Bu test için soru bulunamadı.'),
-        ),
-      );
-    }
-
-    final currentQuestion = _questionList[_currentQuestionIndex];
-    final optionList = List<String>.from(currentQuestion['options']);
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFF),
-      appBar: AppBar(
-        title: Text(widget.testTitle),
-        backgroundColor: const Color(0xFF7B61FF),
+  Widget _buildTestCard(
+    BuildContext context,
+    String emoji,
+    String title,
+    String description,
+    String duration,
+    String testId,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0F7EE),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Center(
+            child: Text(emoji, style: const TextStyle(fontSize: 24)),
+          ),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1B4332),
+          ),
+        ),
+        subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            LinearProgressIndicator(
-              value: (_currentQuestionIndex + 1) / _questionList.length,
-              backgroundColor: Colors.grey[300],
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(Color(0xFF7B61FF)),
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 4),
             Text(
-              'Soru ${_currentQuestionIndex + 1}/${_questionList.length}',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              description,
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
             ),
-            const SizedBox(height: 10),
-            Text(
-              currentQuestion['question'],
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 30),
-            ...List.generate(optionList.length, (index) {
-              return RadioListTile<int>(
-                title: Text(optionList[index]),
-                value: index,
-                groupValue: _answerList[_currentQuestionIndex],
-                onChanged: (value) {
-                  setState(() {
-                    _answerList[_currentQuestionIndex] = value;
-                  });
-                },
-                activeColor: const Color(0xFF7B61FF),
-              );
-            }),
-            const Spacer(),
+            const SizedBox(height: 4),
             Row(
               children: [
-                if (_currentQuestionIndex > 0)
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _currentQuestionIndex--;
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        foregroundColor: Colors.black,
-                      ),
-                      child: const Text('Geri'),
-                    ),
-                  ),
-                if (_currentQuestionIndex > 0) const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _answerList[_currentQuestionIndex] != null
-                        ? () {
-                            if (_currentQuestionIndex <
-                                _questionList.length - 1) {
-                              setState(() {
-                                _currentQuestionIndex++;
-                              });
-                            } else {
-                              _showResultDialog();
-                            }
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF7B61FF),
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text(_currentQuestionIndex < _questionList.length - 1
-                        ? 'İleri'
-                        : 'Bitir'),
-                  ),
+                Icon(Icons.timer, size: 14, color: Colors.grey.shade400),
+                const SizedBox(width: 4),
+                Text(
+                  duration,
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
                 ),
               ],
             ),
           ],
         ),
+        trailing: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF72B01D).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.arrow_forward_ios,
+            color: Color(0xFF72B01D),
+            size: 16,
+          ),
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  TestDetailScreen(testId: testId, testTitle: title),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Test detay sayfası
+class TestDetailScreen extends StatefulWidget {
+  final String testId;
+  final String testTitle;
+
+  const TestDetailScreen({
+    super.key,
+    required this.testId,
+    required this.testTitle,
+  });
+
+  @override
+  State<TestDetailScreen> createState() => _TestDetailScreenState();
+}
+
+class _TestDetailScreenState extends State<TestDetailScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  List<Map<String, dynamic>> _questions = [];
+  Map<int, String> _answers = {};
+  int _currentQuestionIndex = 0;
+  bool _isLoading = true;
+  bool _testStarted = false;
+  bool _testCompleted = false;
+  int _score = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadQuestions();
+  }
+
+  Future<void> _loadQuestions() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final snapshot = await _firestore
+          .collection('tests')
+          .doc(widget.testId)
+          .collection('questions')
+          .orderBy('order')
+          .get();
+
+      _questions = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id,
+          'question': data['question'] ?? '',
+          'options': List<String>.from(data['options'] ?? []),
+          'order': data['order'] ?? 0,
+        };
+      }).toList();
+
+      setState(() => _isLoading = false);
+    } catch (e) {
+      print('Sorular yüklenirken hata: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _startTest() {
+    setState(() {
+      _testStarted = true;
+      _currentQuestionIndex = 0;
+    });
+  }
+
+  void _selectAnswer(String answer) {
+    setState(() {
+      _answers[_currentQuestionIndex] = answer;
+    });
+  }
+
+  void _nextQuestion() {
+    if (_answers[_currentQuestionIndex] == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen bir cevap seçin'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    if (_currentQuestionIndex < _questions.length - 1) {
+      setState(() {
+        _currentQuestionIndex++;
+      });
+    } else {
+      _calculateScore();
+    }
+  }
+
+  void _previousQuestion() {
+    if (_currentQuestionIndex > 0) {
+      setState(() {
+        _currentQuestionIndex--;
+      });
+    }
+  }
+
+  void _calculateScore() {
+    int totalScore = 0;
+    _answers.forEach((index, answer) {
+      final options = _questions[index]['options'] as List;
+      final optionIndex = options.indexOf(answer);
+      if (optionIndex >= 0) {
+        totalScore += optionIndex;
+      }
+    });
+
+    _score = totalScore;
+    _testCompleted = true;
+  }
+
+  String _getResultLevel() {
+    final maxScore = _questions.length * 4;
+    final percentage = (_score / maxScore) * 100;
+
+    if (percentage <= 25) return 'Düşük';
+    if (percentage <= 50) return 'Orta Altı';
+    if (percentage <= 75) return 'Orta Üstü';
+    return 'Yüksek';
+  }
+
+  void _saveResult() async {
+    // Test sonucunu Firebase'e kaydet
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId != null) {
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('test_results')
+            .add({
+          'testId': widget.testId,
+          'testName': widget.testTitle,
+          'score': _score,
+          'maxScore': _questions.length * 4,
+          'percentage': (_score / (_questions.length * 4)) * 100,
+          'level': _getResultLevel(),
+          'answers': _answers,
+          'date': FieldValue.serverTimestamp(),
+        });
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Test sonucunuz kaydedildi! 📊'),
+          backgroundColor: Color(0xFF72B01D),
+        ),
+      );
+    } catch (e) {
+      print('Sonuç kaydedilirken hata: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Sonuç kaydedilemedi: $e'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF0F7EE),
+      appBar: AppBar(
+        title: Text(
+          widget.testTitle,
+          style: const TextStyle(color: Color(0xFF1B4332)),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF72B01D)),
+      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF72B01D)))
+          : _questions.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.warning, size: 50, color: Colors.orange),
+                      const SizedBox(height: 10),
+                      const Text('Bu test için soru bulunamadı'),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Firebase\'de ${widget.testId} testine soru ekleyin',
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+              : _testCompleted
+                  ? _buildResultScreen()
+                  : _testStarted
+                      ? _buildQuestionScreen()
+                      : _buildIntroScreen(),
+    );
+  }
+
+  Widget _buildIntroScreen() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.assignment,
+                color: Color(0xFF72B01D),
+                size: 60,
+              ),
+            ),
+            const SizedBox(height: 30),
+            Text(
+              widget.testTitle,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1B4332),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Bu test ${_questions.length} sorudan oluşmaktadır.',
+              style: const TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Her soruyu dikkatlice okuyun ve size en uygun seçeneği işaretleyin.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _startTest,
+                child: const Text('Teste Başla'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _showResultDialog() {
-    int totalScore = _answerList.fold(0, (sum, item) => sum + (item ?? 0));
-    String level = _getLevelFromScore(totalScore);
+  Widget _buildQuestionScreen() {
+    final question = _questions[_currentQuestionIndex];
+    final options = List<String>.from(question['options']);
+    final selectedAnswer = _answers[_currentQuestionIndex];
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Test Sonucu'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
+    return Column(
+      children: [
+        // Progress
+        Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Soru ${_currentQuestionIndex + 1}/${_questions.length}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1B4332),
+                    ),
+                  ),
+                  Text(
+                    '${((_currentQuestionIndex + 1) / _questions.length * 100).toInt()}%',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              LinearProgressIndicator(
+                value: (_currentQuestionIndex + 1) / _questions.length,
+                backgroundColor: Colors.grey.shade200,
+                color: const Color(0xFF72B01D),
+              ),
+            ],
+          ),
+        ),
+
+        // Question
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    question['question'],
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1B4332),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ...options.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final option = entry.value;
+                  final isSelected = selectedAnswer == option;
+
+                  return GestureDetector(
+                    onTap: () => _selectAnswer(option),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFF72B01D).withValues(alpha: 0.1)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFF72B01D)
+                              : Colors.grey.shade200,
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isSelected
+                                  ? const Color(0xFF72B01D)
+                                  : Colors.white,
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFF72B01D)
+                                    : Colors.grey,
+                              ),
+                            ),
+                            child: isSelected
+                                ? const Icon(Icons.check,
+                                    size: 16, color: Colors.white)
+                                : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              option,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? const Color(0xFF1B4332)
+                                    : Colors.grey.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+
+        // Navigation Buttons
+        Container(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              if (_currentQuestionIndex > 0)
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _previousQuestion,
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFF72B01D)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                    child: const Text('Önceki'),
+                  ),
+                ),
+              if (_currentQuestionIndex > 0) const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _nextQuestion,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  child: Text(
+                    _currentQuestionIndex == _questions.length - 1
+                        ? 'Bitir'
+                        : 'Sonraki',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildResultScreen() {
+    final maxScore = _questions.length * 4;
+    final percentage = (_score / maxScore) * 100;
+    final level = _getResultLevel();
+
+    Color levelColor;
+    if (level == 'Yüksek') {
+      levelColor = const Color(0xFF72B01D);
+    } else if (level == 'Orta Üstü') {
+      levelColor = Colors.blue;
+    } else if (level == 'Orta Altı') {
+      levelColor = Colors.orange;
+    } else {
+      levelColor = Colors.redAccent;
+    }
+
+    String resultMessage;
+    if (percentage <= 25) {
+      resultMessage =
+          'Kendinize daha fazla zaman ayırın. İhtiyacınız olan desteği almayı unutmayın. 🌱';
+    } else if (percentage <= 50) {
+      resultMessage =
+          'İyi gidiyorsunuz! Küçük adımlarla ilerlemeye devam edin. 🌿';
+    } else if (percentage <= 75) {
+      resultMessage = 'Çok iyi durumdasınız! Bu pozitif enerjinizi koruyun. ✨';
+    } else {
+      resultMessage =
+          'Harika bir ruh halindesiniz! Bu enerjinizi sevdiklerinizle paylaşın. 🌟';
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Toplam Puan: $totalScore'),
-            const SizedBox(height: 10),
-            Text(
-              level,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                percentage >= 70 ? Icons.emoji_emotions : Icons.analytics,
+                color: levelColor,
+                size: 60,
+              ),
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              'Test Tamamlandı!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1B4332),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    '$_score / $maxScore',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: levelColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '%${percentage.toInt()} Başarı',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: levelColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      level,
+                      style: TextStyle(
+                        color: levelColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0F7EE),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                resultMessage,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF1B4332),
+                  height: 1.4,
+                ),
+              ),
+            ),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _saveResult,
+                child: const Text('Sonuçları Kaydet ve Bitir'),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Test Listesine Dön',
+                style: TextStyle(color: Color(0xFF72B01D)),
+              ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              await _testsService.saveTestResult(
-                testId: widget.testId,
-                testName: widget.testTitle,
-                score: totalScore,
-                level: level,
-                answers: {'answers': _answerList},
-              );
-
-              if (context.mounted) {
-                Navigator.pop(context);
-                Navigator.pop(context);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Sonuç kaydedildi!')),
-                );
-              }
-            },
-            child: const Text('Kaydet'),
-          ),
-        ],
       ),
     );
   }

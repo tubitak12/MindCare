@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'activities_screen.dart';
 import 'tests_screen.dart';
 import 'daily_screen.dart';
 import 'settings_screen.dart';
+import 'analytics_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -23,6 +25,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isCookieBroken = false;
   String _cookieMessage = "Kurabiyeyi kır ve günün mesajını al!";
 
+  // Ses için değişkenler
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  String? _playingTitle;
+
   final List<String> _messages = const [
     "Bugün senin günün! ✨",
     "Kendine güven, her şey güzel olacak 🌿",
@@ -31,27 +37,35 @@ class _HomeScreenState extends State<HomeScreen> {
     "Sevgiyle kal, mutluluk seni bulacak 💚",
   ];
 
+  // Ses çalma fonksiyonu
+  void _toggleMusic(String fileName, String title) async {
+    try {
+      if (_playingTitle == title) {
+        await _audioPlayer.stop();
+        setState(() => _playingTitle = null);
+      } else {
+        await _audioPlayer.stop();
+        await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+        await _audioPlayer.play(AssetSource('sounds/$fileName'));
+        setState(() => _playingTitle = title);
+      }
+    } catch (e) {
+      print('Ses çalma hatası: $e');
+      _showSnackBar('Ses dosyası bulunamadı: $fileName');
+    }
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
-    setState(() => _selectedIndex = index);
-
-    switch (index) {
-      case 1:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const ActivitiesScreen()));
-        break;
-      case 2:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const TestsScreen()));
-        break;
-      case 3:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const DailyScreen()));
-        break;
-      case 4:
-        _showSnackBar("Analiz yakında! 📊");
-        break;
-    }
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   void _breakCookie() {
@@ -78,73 +92,60 @@ class _HomeScreenState extends State<HomeScreen> {
         content: Text(message),
         backgroundColor: const Color(0xFF72B01D),
         behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Hoş Geldin',
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            Text(
-              widget.userName,
-              style: const TextStyle(
-                color: Color(0xFF1B4332),
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0F7EE),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(widget.userEmoji, style: const TextStyle(fontSize: 20)),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings, color: Color(0xFF72B01D)),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
-            ),
-          ),
+  Widget _getPage() {
+    switch (_selectedIndex) {
+      case 0:
+        return _buildHomeContent();
+      case 1:
+        return const ActivitiesScreen();
+      case 2:
+        return const TestsScreen();
+      case 3:
+        return const DailyScreen();
+      case 4:
+        return const AnalyticsScreen();
+      case 5:
+        return const SettingsScreen();
+      default:
+        return _buildHomeContent();
+    }
+  }
+
+  Widget _buildHomeContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          _buildMoodCard(),
+          const SizedBox(height: 20),
+          _buildCookieCard(),
+          const SizedBox(height: 20),
+          _buildSectionTitle('Ruh Haline Özel Sesler'),
+          const SizedBox(height: 10),
+          _buildMusicItem(
+              'Huzurlu Orman', 'Doğa Sesleri', '1 dk 49sn', 'forest.mp3'),
+          _buildMusicItem(
+              'Odaklanma', 'Yağmur Sesleri', '1dk 48sn', 'rain.mp3'),
+          _buildMusicItem(
+              'Derin Meditasyon', 'Beyaz Gürültü', '10sn', 'whitenoise.mp3'),
+          _buildMusicItem(
+              'Gece Ambiyansı', 'Cırcır Böcekleri', '3dk', 'night.mp3'),
+          _buildMusicItem(
+              'Deniz Dalgaları', 'Okyanus Esintisi', '22sn', 'ocean.mp3'),
+          _buildMusicItem(
+              'Sıcak Şömine', 'Ateş Çatırtısı', '2dk 50sn', 'fireplace.mp3'),
+          const SizedBox(height: 20),
+          _buildSectionTitle('Hızlı Erişim'),
+          const SizedBox(height: 10),
+          _buildQuickAccessGrid(),
+          const SizedBox(height: 30),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildMoodCard(),
-            const SizedBox(height: 20),
-            _buildCookieCard(),
-            const SizedBox(height: 20),
-            _buildSectionTitle('Ruh Haline Özel'),
-            const SizedBox(height: 10),
-            _buildMusicItem('Huzurlu Orman', 'Doğa Sesleri', '45dk'),
-            _buildMusicItem('Odaklanma', 'Lo-fi Beats', '60dk'),
-            _buildMusicItem('Derin Meditasyon', 'Binaural', '30dk'),
-            const SizedBox(height: 20),
-            _buildSectionTitle('Hızlı Aktiviteler'),
-            const SizedBox(height: 10),
-            _buildActivityGrid(),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
@@ -249,15 +250,23 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMusicItem(String title, String subtitle, String duration) {
+  Widget _buildMusicItem(
+      String title, String subtitle, String duration, String fileName) {
+    bool isPlaying = _playingTitle == title;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isPlaying ? const Color(0xFFF0F7EE) : Colors.white,
         borderRadius: BorderRadius.circular(15),
       ),
       child: ListTile(
-        leading: const Icon(Icons.music_note, color: Color(0xFF72B01D)),
+        onTap: () => _toggleMusic(fileName, title),
+        leading: Icon(
+          isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+          color: const Color(0xFF72B01D),
+          size: 30,
+        ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text(subtitle),
         trailing: Container(
@@ -272,52 +281,119 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildActivityGrid() {
+  Widget _buildQuickAccessGrid() {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 4,
       children: [
-        _buildActivityItem(Icons.self_improvement, 'Meditasyon'),
-        _buildActivityItem(Icons.library_music, 'Müzik'),
-        _buildActivityItem(Icons.assignment, 'Test'),
-        _buildActivityItem(Icons.book, 'Günlük'),
-      ],
-    );
-  }
-
-  Widget _buildActivityItem(IconData icon, String label) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Icon(icon, color: const Color(0xFF72B01D)),
+        _buildQuickAccessItem(
+          Icons.self_improvement,
+          'Meditasyon',
+          () => setState(() => _selectedIndex = 1),
         ),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontSize: 12)),
+        _buildQuickAccessItem(
+          Icons.assignment,
+          'Testler',
+          () => setState(() => _selectedIndex = 2),
+        ),
+        _buildQuickAccessItem(
+          Icons.book,
+          'Günlük',
+          () => setState(() => _selectedIndex = 3),
+        ),
+        _buildQuickAccessItem(
+          Icons.analytics,
+          'Analiz',
+          () => setState(() => _selectedIndex = 4),
+        ),
       ],
     );
   }
 
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      currentIndex: _selectedIndex,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: const Color(0xFF72B01D),
-      unselectedItemColor: Colors.grey,
-      onTap: _onItemTapped,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Ana Sayfa'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.self_improvement), label: 'Aktiviteler'),
-        BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Testler'),
-        BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Günlük'),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Analiz'),
-      ],
+  Widget _buildQuickAccessItem(
+      IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Icon(icon, color: const Color(0xFF72B01D)),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF0F7EE),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Hoş Geldin',
+              style: TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+            Text(
+              widget.userName,
+              style: const TextStyle(
+                color: Color(0xFF1B4332),
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0F7EE),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(widget.userEmoji, style: const TextStyle(fontSize: 20)),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings, color: Color(0xFF72B01D)),
+            onPressed: () {
+              setState(() {
+                _selectedIndex = 5;
+              });
+            },
+          ),
+        ],
+      ),
+      body: _getPage(),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF72B01D),
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Ana Sayfa'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.self_improvement), label: 'Aktiviteler'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.assignment), label: 'Testler'),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Günlük'),
+          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Analiz'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ayarlar'),
+        ],
+      ),
     );
   }
 }

@@ -77,13 +77,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       final User? user = await _authService.registerWithEmail(
-        _emailController.text,
+        _emailController.text.trim(),
         _passwordController.text,
       );
 
       if (user == null) throw Exception('Kullanıcı oluşturulamadı');
 
-      await _authService.updateDisplayName(user, _nameController.text);
+      await _authService.updateDisplayName(user, _nameController.text.trim());
 
       if (!mounted) return;
 
@@ -155,6 +155,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
                 const SizedBox(height: 30),
+
+                // Ad Soyad
                 TextFormField(
                   controller: _nameController,
                   validator: (v) => v == null || v.length < 3
@@ -167,6 +169,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Doğum Tarihi
                 GestureDetector(
                   onTap: _selectDate,
                   child: AbsorbPointer(
@@ -184,6 +188,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // E-posta
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -201,6 +207,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Şifre
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _isObscure1,
@@ -221,6 +229,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Şifre Tekrar
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _isObscure2,
@@ -240,6 +250,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+
                 if (_isLoading)
                   const CircularProgressIndicator(color: Color(0xFF72B01D))
                 else
@@ -248,6 +259,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: const Text('Kayıt Ol'),
                   ),
                 const SizedBox(height: 16),
+
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text(

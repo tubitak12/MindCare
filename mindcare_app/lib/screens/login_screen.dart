@@ -34,11 +34,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final user = await _authService.signInWithEmail(
-        _emailController.text.trim(), // Boşlukları temizleyerek gönderiyoruz
+        _emailController.text.trim(),
         _passwordController.text,
       );
 
-      // Async işlemden sonra widget'ın hala ekranda olup olmadığını kontrol ediyoruz
       if (!mounted) return;
 
       if (user != null) {
@@ -56,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      _showSnackBar('Giriş başarısız: Beklenmedik bir hata oluştu');
+      _showSnackBar('Giriş başarısız. Lütfen tekrar deneyin.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -106,16 +105,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 50),
 
                 // E-posta Alanı
-                _buildTextField(
+                TextFormField(
                   controller: _emailController,
-                  label: 'E-posta',
-                  icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'E-posta gerekli';
                     if (!v.contains('@')) return 'Geçerli bir e-posta giriniz';
                     return null;
                   },
+                  decoration: const InputDecoration(
+                    labelText: 'E-posta',
+                    prefixIcon:
+                        Icon(Icons.email_outlined, color: Color(0xFF72B01D)),
+                  ),
                 ),
 
                 const SizedBox(height: 20),
@@ -135,8 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           _isObscure ? Icons.visibility_off : Icons.visibility),
                       onPressed: () => setState(() => _isObscure = !_isObscure),
                     ),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15)),
                   ),
                 ),
 
@@ -165,11 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ElevatedButton(
                     onPressed: _handleLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF72B01D),
-                      foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 55),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
                     ),
                     child: const Text('Giriş Yap',
                         style: TextStyle(
@@ -203,25 +199,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF72B01D)),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
       ),
     );
   }

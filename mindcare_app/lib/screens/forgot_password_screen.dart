@@ -25,14 +25,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Firebase'e şifre sıfırlama e-postası göndermesini söyle
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: _emailController.text.trim(),
       );
 
       if (!mounted) return;
 
-      // Başarılı mesajı göster
       _showDialog(
         'Başarılı!',
         'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin. 📧',
@@ -70,9 +68,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Dialog'u kapat
+              Navigator.pop(context);
               if (isSuccess) {
-                Navigator.pop(context); // Şifre sıfırlama sayfasını kapat
+                Navigator.pop(context);
               }
             },
             child: const Text('Tamam'),
@@ -103,6 +101,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 30),
+
                 // Icon
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -117,6 +116,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+
                 // Başlık
                 const Text(
                   'Şifrenizi mi Unuttunuz?',
@@ -127,6 +127,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
                 // Açıklama
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
@@ -137,6 +138,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+
                 // E-posta alanı
                 TextFormField(
                   controller: _emailController,
@@ -158,18 +160,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+
                 // Gönder butonu
                 if (_isLoading)
                   const CircularProgressIndicator(color: Color(0xFF72B01D))
                 else
                   ElevatedButton(
                     onPressed: _resetPassword,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 55),
-                    ),
                     child: const Text('Bağlantı Gönder'),
                   ),
                 const SizedBox(height: 16),
+
                 // Giriş ekranına dön
                 TextButton(
                   onPressed: () => Navigator.pop(context),

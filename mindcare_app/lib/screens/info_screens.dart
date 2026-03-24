@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'mood_selection_screen.dart'; // mood_selection_screen'e yönlendiriyoruz
+import 'mood_selection_screen.dart';
 
 class InfoFlowScreen extends StatefulWidget {
   final String userName;
@@ -38,7 +38,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE), // Proje arka plan rengi
+      backgroundColor: const Color(0xFFF0F7EE),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -52,7 +52,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 5),
                     ),
@@ -100,8 +100,6 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
                           flex: _currentPage == 0 ? 1 : 2,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF72B01D),
-                              foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
@@ -113,7 +111,6 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
                                 _animationController.reset();
                                 _animationController.forward();
                               } else {
-                                // Mood selection screen'e yönlendir
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -323,10 +320,10 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
       width: 100,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F7EE).withOpacity(0.5),
+        color: const Color(0xFFF0F7EE).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: const Color(0xFF72B01D).withOpacity(0.2),
+          color: const Color(0xFF72B01D).withValues(alpha: 0.2),
         ),
       ),
       child: Column(

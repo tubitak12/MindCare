@@ -19,51 +19,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
-      appBar: AppBar(
-        title: const Text('Ayarlar',
-            style: TextStyle(
-                color: Color(0xFF1B4332), fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF72B01D)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildProfileCard(user),
-            const SizedBox(height: 25),
-            _buildSettingsGroup('Tercihler', [
-              _buildSwitchTile(
-                'Bildirimler',
-                'Günlük motivasyon mesajları',
-                Icons.notifications_outlined,
-                _notificationsEnabled,
-                (value) => setState(() => _notificationsEnabled = value),
-              ),
-              _buildSwitchTile(
-                'Karanlık Mod',
-                'Göz yorgunluğunu azaltın',
-                Icons.dark_mode_outlined,
-                _darkModeEnabled,
-                (value) => setState(() => _darkModeEnabled = value),
-              ),
-              _buildLanguageTile(),
-            ]),
-            const SizedBox(height: 16),
-            _buildSettingsGroup('Hesap Güvenliği', [
-              _buildSettingsTile(Icons.lock_reset_rounded, 'Şifre Yenileme',
-                  'E-postanıza bağlantı gönderir', _showPasswordChangeDialog),
-              _buildSettingsTile(Icons.delete_forever_outlined, 'Hesabı Kapat',
-                  'Verilerinizi kalıcı olarak siler', _showDeleteAccountDialog,
-                  isDestructive: true),
-            ]),
-            const SizedBox(height: 40),
-            _buildLogoutButton(),
-          ],
-        ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          _buildProfileCard(user),
+          const SizedBox(height: 25),
+          _buildSettingsGroup('Tercihler', [
+            _buildSwitchTile(
+              'Bildirimler',
+              'Günlük motivasyon mesajları',
+              Icons.notifications_outlined,
+              _notificationsEnabled,
+              (value) => setState(() => _notificationsEnabled = value),
+            ),
+            _buildSwitchTile(
+              'Karanlık Mod',
+              'Göz yorgunluğunu azaltın',
+              Icons.dark_mode_outlined,
+              _darkModeEnabled,
+              (value) => setState(() => _darkModeEnabled = value),
+            ),
+            _buildLanguageTile(),
+          ]),
+          const SizedBox(height: 16),
+          _buildSettingsGroup('Hesap Güvenliği', [
+            _buildSettingsTile(
+              Icons.lock_reset_rounded,
+              'Şifre Yenileme',
+              'E-postanıza bağlantı gönderir',
+              _showPasswordChangeDialog,
+            ),
+            _buildSettingsTile(
+              Icons.delete_forever_outlined,
+              'Hesabı Kapat',
+              'Verilerinizi kalıcı olarak siler',
+              _showDeleteAccountDialog,
+              isDestructive: true,
+            ),
+          ]),
+          const SizedBox(height: 40),
+          _buildLogoutButton(),
+        ],
       ),
     );
   }
@@ -76,9 +73,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-              color: Colors.black
-                  .withValues(alpha: 0.05), // withOpacity yerine withValues
-              blurRadius: 10)
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+          )
         ],
       ),
       child: Row(
@@ -93,17 +90,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(user?.displayName ?? 'Kullanıcı',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-                Text(user?.email ?? 'email@example.com',
-                    style: const TextStyle(color: Colors.grey)),
+                Text(
+                  user?.displayName ?? 'Kullanıcı',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  user?.email ?? 'email@example.com',
+                  style: const TextStyle(color: Colors.grey),
+                ),
               ],
             ),
           ),
           IconButton(
-              icon: const Icon(Icons.edit_note, color: Color(0xFF72B01D)),
-              onPressed: _showEditProfileDialog),
+            icon: const Icon(Icons.edit_note, color: Color(0xFF72B01D)),
+            onPressed: _showEditProfileDialog,
+          ),
         ],
       ),
     );
@@ -118,17 +120,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'E-posta adresinize sıfırlama bağlantısı gönderilsin mi?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('İptal')),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
           ElevatedButton(
             onPressed: () async {
               final email = _authService.currentUser?.email;
               if (email != null) {
                 await _authService.sendPasswordReset(email);
-
-                // ASYNC GAP ÇÖZÜMÜ: mounted kontrolü eklendi
                 if (!mounted) return;
-
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -146,17 +146,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSwitchTile(String title, String subtitle, IconData icon,
-      bool value, Function(bool) onChanged) {
+  Widget _buildSwitchTile(
+    String title,
+    String subtitle,
+    IconData icon,
+    bool value,
+    Function(bool) onChanged,
+  ) {
     return SwitchListTile(
       secondary: Icon(icon, color: const Color(0xFF72B01D)),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
       value: value,
       onChanged: onChanged,
-      // DEPRECATED ÇÖZÜMÜ: activeThumbColor ve activeTrackColor kullanıldı
-      activeThumbColor: const Color(0xFF72B01D),
-      activeTrackColor: const Color(0xFF72B01D).withValues(alpha: 0.5),
+      activeColor: const Color(0xFF72B01D),
     );
   }
 
@@ -169,37 +172,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
         label: const Text('Çıkış Yap',
             style: TextStyle(fontWeight: FontWeight.bold)),
         style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15))),
+          backgroundColor: Colors.redAccent,
+          foregroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        ),
         onPressed: () async {
           await _authService.signOut();
           if (!mounted) return;
           Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (route) => false);
+            context,
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+            (route) => false,
+          );
         },
       ),
     );
   }
 
-  // Diğer yardımcı UI metodları
   Widget _buildSettingsGroup(String title, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(20)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(title,
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF72B01D))),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF72B01D),
+              ),
+            ),
           ),
           ...children,
         ],
@@ -208,15 +217,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSettingsTile(
-      IconData icon, String title, String subtitle, VoidCallback onTap,
-      {bool isDestructive = false}) {
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap, {
+    bool isDestructive = false,
+  }) {
     return ListTile(
-      leading: Icon(icon,
-          color: isDestructive ? Colors.redAccent : const Color(0xFF72B01D)),
-      title: Text(title,
-          style: TextStyle(
-              color:
-                  isDestructive ? Colors.redAccent : const Color(0xFF1B4332))),
+      leading: Icon(
+        icon,
+        color: isDestructive ? Colors.redAccent : const Color(0xFF72B01D),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isDestructive ? Colors.redAccent : const Color(0xFF1B4332),
+        ),
+      ),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
       trailing:
           const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
@@ -245,12 +262,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: TextField(
           controller: controller,
           decoration: const InputDecoration(
-              labelText: 'Ad Soyad', border: OutlineInputBorder()),
+            labelText: 'Ad Soyad',
+            border: OutlineInputBorder(),
+          ),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('İptal')),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
           ElevatedButton(
             onPressed: () async {
               if (controller.text.trim().isNotEmpty) {
@@ -279,8 +299,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: const Text('Emin misiniz? Bu işlem geri alınamaz.'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Vazgeç')),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Vazgeç'),
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.pop(context),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart'; // ← MoodDetailScreen yerine HomeScreen
+import 'home_screen.dart';
 
 class MoodSelectionScreen extends StatefulWidget {
   final String userName;
@@ -83,7 +83,7 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFF72B01D).withOpacity(0.1)
+                            ? const Color(0xFF72B01D).withValues(alpha: 0.1)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
@@ -124,14 +124,12 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
                 onPressed: selectedMood == null
                     ? null
                     : () {
-                        // DOĞRUDAN HOME SCREEN'E GİT (MoodDetailScreen ATLANDI)
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => HomeScreen(
                               userName: widget.userName,
-                              userEmoji:
-                                  selectedEmoji!, // Seçilen emoji ana sayfada gösterilecek
+                              userEmoji: selectedEmoji!,
                             ),
                           ),
                         );

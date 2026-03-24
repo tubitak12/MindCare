@@ -16,23 +16,50 @@ class EncryptionService {
 
   // Şifre ile metin şifrele
   String encryptText(String plainText, String password) {
-    final key = Key.fromUtf8(password.padRight(32).substring(0, 32));
-    final iv = IV.fromLength(16);
-    final encrypter = Encrypter(AES(key));
+    try {
+      // Şifreyi 32 byte'a tamamla (AES-256 için)
+      final keyString = password.padRight(32).substring(0, 32);
+      final key = Key.fromUtf8(keyString);
 
-    return encrypter.encrypt(plainText, iv: iv).base64;
+      // Rastgele IV oluştur
+      final iv = IV.fromSecureRandom(16);
+      final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
+
+      // Şifrele ve IV'yi de ekleyerek döndür
+      final encrypted = encrypter.encrypt(plainText, iv: iv);
+
+      // IV'yi de şifreli metnin başına ekle (çözme için)
+      return '${iv.base64}:${encrypted.base64}';
+    } catch (e) {
+      print('Şifreleme hatası: $e');
+      return plainText; // Hata durumunda orijinal metni döndür
+    }
   }
 
   // Şifre ile metin çöz
   String decryptText(String encryptedText, String password) {
     try {
-      final key = Key.fromUtf8(password.padRight(32).substring(0, 32));
-      final iv = IV.fromLength(16);
-      final encrypter = Encrypter(AES(key));
+      // IV ve şifreli metni ayır
+      final parts = encryptedText.split(':');
+      if (parts.length != 2) {
+        return "Geçersiz şifreli format";
+      }
 
-      return encrypter.decrypt64(encryptedText, iv: iv);
+      final ivBase64 = parts[0];
+      final encryptedBase64 = parts[1];
+
+      // Şifreyi 32 byte'a tamamla
+      final keyString = password.padRight(32).substring(0, 32);
+      final key = Key.fromUtf8(keyString);
+      final iv = IV.fromBase64(ivBase64);
+      final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
+
+      final decrypted =
+          encrypter.decrypt(Encrypted.fromBase64(encryptedBase64), iv: iv);
+      return decrypted;
     } catch (e) {
-      return "Çözülemedi - Yanlış şifre";
+      print('Çözme hatası: $e');
+      return "🔒 Şifreli içerik (şifre hatalı veya bozuk veri)";
     }
   }
 
