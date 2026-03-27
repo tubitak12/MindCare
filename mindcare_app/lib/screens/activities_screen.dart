@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'breathing_exercise_screen.dart';
+import 'breathing_exercise_screen.dart' as be; // alias be
+import 'box_breathing_screen.dart' as bb;      // alias bb
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
@@ -11,7 +12,7 @@ class ActivitiesScreen extends StatelessWidget {
       child: Column(
         children: [
           _buildCategoryCard(
-            context, // context parametresi eklendi
+            context,
             'Meditasyon',
             'Zihnini dinlendir',
             Icons.self_improvement,
@@ -36,7 +37,7 @@ class ActivitiesScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _buildCategoryCard(
-            context, // context parametresi eklendi
+            context,
             'Nefes Egzersizleri',
             'Derin nefes al',
             Icons.air,
@@ -49,7 +50,7 @@ class ActivitiesScreen extends StatelessWidget {
               },
               {
                 'title': 'Kutu Nefesi',
-                'duration': '3 dk',
+                'duration': '3 dk', // 3 dk olarak ayarlandı
                 'description': 'Odaklanma için'
               },
               {
@@ -61,7 +62,7 @@ class ActivitiesScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _buildCategoryCard(
-            context, // context parametresi eklendi
+            context,
             'Motivasyon',
             'Kendine güç ver',
             Icons.bolt,
@@ -90,7 +91,7 @@ class ActivitiesScreen extends StatelessWidget {
   }
 
   Widget _buildCategoryCard(
-    BuildContext context, // context parametresi eklendi
+    BuildContext context,
     String title,
     String subtitle,
     IconData icon,
@@ -112,7 +113,7 @@ class ActivitiesScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
+                    color: color.withValues(alpha: (0.1 * 255).toDouble()),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icon, color: color),
@@ -151,7 +152,7 @@ class ActivitiesScreen extends StatelessWidget {
   }
 
   Widget _buildActivityItem(
-    BuildContext context, // context parametresi eklendi
+    BuildContext context,
     String title,
     String duration,
     String description,
@@ -187,23 +188,32 @@ class ActivitiesScreen extends StatelessWidget {
         ),
       ),
       onTap: () {
-        if (title == '4-7-8 Nefesi') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const BreathingExerciseScreen(),
-            ),
-          );
-          return;
+        switch (title) {
+          case '4-7-8 Nefesi':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const be.BreathingExerciseScreen(),
+              ),
+            );
+            break;
+          case 'Kutu Nefesi':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const bb.BoxBreathingScreen(),
+              ),
+            );
+            break;
+          default:
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('$title aktivitesi yakında! 🧘'),
+                backgroundColor: const Color(0xFF72B01D),
+                behavior: SnackBarBehavior.fixed,
+              ),
+            );
         }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$title aktivitesi yakında! 🧘'),
-            backgroundColor: const Color(0xFF72B01D),
-            behavior: SnackBarBehavior.fixed,
-          ),
-        );
       },
     );
   }

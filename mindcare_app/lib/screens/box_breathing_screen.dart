@@ -1,25 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-class BreathingExerciseScreen extends StatefulWidget {
-  const BreathingExerciseScreen({super.key});
+class BoxBreathingScreen extends StatefulWidget {
+  const BoxBreathingScreen({super.key});
 
   @override
-  State<BreathingExerciseScreen> createState() =>
-      _BreathingExerciseScreenState();
+  State<BoxBreathingScreen> createState() => _BoxBreathingScreenState();
 }
 
-enum _BreathPhase { inhale, hold, exhale, finished }
+enum _BoxBreathPhase { inhale, hold, exhale, holdAfterExhale, finished }
 
-class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
-  static const int _totalSeconds = 120;
-  static const int _inhaleSeconds = 4;
-  static const int _holdSeconds = 7;
-  static const int _exhaleSeconds = 8;
+class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
+  static const int _totalSeconds = 180; // 3 dakika
+  static const int _phaseSeconds = 4; // Her adım 4 saniye
 
   int _remainingSeconds = _totalSeconds;
-  _BreathPhase _phase = _BreathPhase.finished;
-  int _phaseRemaining = _inhaleSeconds;
+  _BoxBreathPhase _phase = _BoxBreathPhase.finished;
+  int _phaseRemaining = _phaseSeconds;
   Timer? _timer;
 
   bool get _isRunning => _timer?.isActive ?? false;
@@ -35,8 +32,8 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
 
     setState(() {
       _remainingSeconds = _totalSeconds;
-      _phase = _BreathPhase.inhale;
-      _phaseRemaining = _inhaleSeconds;
+      _phase = _BoxBreathPhase.inhale;
+      _phaseRemaining = _phaseSeconds;
     });
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -45,7 +42,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
       if (_remainingSeconds <= 0) {
         timer.cancel();
         setState(() {
-          _phase = _BreathPhase.finished;
+          _phase = _BoxBreathPhase.finished;
           _phaseRemaining = 0;
         });
         return;
@@ -57,24 +54,22 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
 
         if (_phaseRemaining <= 0) {
           switch (_phase) {
-            case _BreathPhase.inhale:
-              _phase = _BreathPhase.hold;
-              _phaseRemaining = _holdSeconds;
+            case _BoxBreathPhase.inhale:
+              _phase = _BoxBreathPhase.hold;
               break;
-
-            case _BreathPhase.hold:
-              _phase = _BreathPhase.exhale;
-              _phaseRemaining = _exhaleSeconds;
+            case _BoxBreathPhase.hold:
+              _phase = _BoxBreathPhase.exhale;
               break;
-
-            case _BreathPhase.exhale:
-              _phase = _BreathPhase.inhale;
-              _phaseRemaining = _inhaleSeconds;
+            case _BoxBreathPhase.exhale:
+              _phase = _BoxBreathPhase.holdAfterExhale;
               break;
-
-            case _BreathPhase.finished:
+            case _BoxBreathPhase.holdAfterExhale:
+              _phase = _BoxBreathPhase.inhale;
+              break;
+            case _BoxBreathPhase.finished:
               break;
           }
+          _phaseRemaining = _phaseSeconds;
         }
       });
     });
@@ -83,63 +78,55 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
   void _stopSession() {
     _timer?.cancel();
     setState(() {
-      _phase = _BreathPhase.finished;
+      _phase = _BoxBreathPhase.finished;
       _phaseRemaining = 0;
     });
   }
 
   String get _phaseLabel {
     switch (_phase) {
-      case _BreathPhase.inhale:
+      case _BoxBreathPhase.inhale:
         return 'Nefes al';
-      case _BreathPhase.hold:
+      case _BoxBreathPhase.hold:
+      case _BoxBreathPhase.holdAfterExhale:
         return 'Tut';
-      case _BreathPhase.exhale:
+      case _BoxBreathPhase.exhale:
         return 'Ver';
-      case _BreathPhase.finished:
+      case _BoxBreathPhase.finished:
         return 'Hazır';
     }
   }
 
   String get _phaseEmoji {
     switch (_phase) {
-      case _BreathPhase.inhale:
+      case _BoxBreathPhase.inhale:
         return '🌬️';
-      case _BreathPhase.hold:
+      case _BoxBreathPhase.hold:
+      case _BoxBreathPhase.holdAfterExhale:
         return '⏸️';
-      case _BreathPhase.exhale:
+      case _BoxBreathPhase.exhale:
         return '💨';
-      case _BreathPhase.finished:
+      case _BoxBreathPhase.finished:
         return '🧘';
     }
   }
 
   Color get _phaseColor {
     switch (_phase) {
-      case _BreathPhase.inhale:
+      case _BoxBreathPhase.inhale:
         return const Color(0xFF72B01D);
-      case _BreathPhase.hold:
+      case _BoxBreathPhase.hold:
+      case _BoxBreathPhase.holdAfterExhale:
         return const Color(0xFF1B4332);
-      case _BreathPhase.exhale:
+      case _BoxBreathPhase.exhale:
         return const Color(0xFF4E8A3A);
-      case _BreathPhase.finished:
+      case _BoxBreathPhase.finished:
         return Colors.grey;
     }
   }
 
-  double get _phaseProgress {
-    final total = _phase == _BreathPhase.inhale
-        ? _inhaleSeconds
-        : _phase == _BreathPhase.hold
-            ? _holdSeconds
-            : _phase == _BreathPhase.exhale
-                ? _exhaleSeconds
-                : 1;
-
-    if (_phase == _BreathPhase.finished) return 0;
-
-    return 1 - (_phaseRemaining / total);
-  }
+  double get _phaseProgress =>
+      1 - (_phaseRemaining / _phaseSeconds);
 
   String get _timeFormatted {
     final min = (_remainingSeconds ~/ 60).toString().padLeft(2, '0');
@@ -152,7 +139,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F7EE),
       appBar: AppBar(
-        title: const Text("4-7-8 Nefes"),
+        title: const Text("Kutu Nefesi"),
         backgroundColor: const Color(0xFF72B01D),
       ),
       body: Padding(
@@ -200,7 +187,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
                           height: size * (0.6 + _phaseProgress * 0.3),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: _phaseColor.withAlpha((0.2 * 255).round()), // updated
+                            color: _phaseColor.withValues(alpha: 51),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -209,7 +196,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
                                   style: const TextStyle(fontSize: 40)),
                               const SizedBox(height: 8),
                               Text(
-                                _phase == _BreathPhase.finished
+                                _phase == _BoxBreathPhase.finished
                                     ? '0'
                                     : '$_phaseRemaining',
                                 style: TextStyle(
