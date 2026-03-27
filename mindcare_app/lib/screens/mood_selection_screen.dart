@@ -68,7 +68,9 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
                     }),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF72B01D).withOpacity(0.1) : Colors.white,
+                        color: isSelected
+                            ? const Color(0xFF72B01D).withValues(alpha: 26)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: isSelected ? const Color(0xFF72B01D) : Colors.grey.shade200, width: 2),
                       ),

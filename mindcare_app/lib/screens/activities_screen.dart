@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'breathing_exercise_screen.dart';
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
@@ -139,7 +140,7 @@ class ActivitiesScreen extends StatelessWidget {
           ),
           const Divider(height: 1),
           ...items.map((item) => _buildActivityItem(
-                context, // context parametresi eklendi
+                context,
                 item['title']!,
                 item['duration']!,
                 item['description']!,
@@ -186,11 +187,21 @@ class ActivitiesScreen extends StatelessWidget {
         ),
       ),
       onTap: () {
+        if (title == '4-7-8 Nefesi') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const BreathingExerciseScreen(),
+            ),
+          );
+          return;
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('$title aktivitesi yakında! 🧘'),
             backgroundColor: const Color(0xFF72B01D),
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
           ),
         );
       },

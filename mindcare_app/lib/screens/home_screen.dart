@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       SnackBar(
         content: Text("Hoş geldin ${widget.userName}! ✨ Modun kaydedildi.", textAlign: TextAlign.center),
         backgroundColor: const Color(0xFF72B01D),
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
         margin: EdgeInsets.only(
           bottom: MediaQuery.of(context).size.height - 100, // Mesajı yukarı taşır
           left: 20,
@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
       SnackBar(
         content: Text(message),
         backgroundColor: const Color(0xFF72B01D),
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -167,13 +167,13 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(widget.userEmoji, style: const TextStyle(fontSize: 30)),
           ),
           const SizedBox(width: 16),
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Bugünün Ruh Hali', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 4),
-                const Text('Kendine iyi bak, her şey yolunda.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                Text('Bugünün Ruh Hali', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                SizedBox(height: 4),
+                Text('Kendine iyi bak, her şey yolunda.', style: TextStyle(color: Colors.grey, fontSize: 13)),
               ],
             ),
           ),

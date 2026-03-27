@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Bunu ekledik
 import '../services/auth_service.dart';
-import 'register_screen.dart';
-import 'forgot_password_screen.dart';
 import 'mood_selection_screen.dart';
 import 'home_screen.dart';
 
@@ -36,6 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (user != null) {
         final prefs = await SharedPreferences.getInstance();
+        if (!mounted) return;
+
         final String today = DateTime.now().toIso8601String().split('T')[0];
         final String? lastMoodDate = prefs.getString('last_mood_date');
 
@@ -63,16 +63,16 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } else {
-        _showSnackBar('E-posta veya şifre hatalı');
+        _showSnackBar(context, 'E-posta veya şifre hatalı');
       }
     } catch (e) {
-      _showSnackBar('Giriş başarısız.');
+      if (mounted) _showSnackBar(context, 'Giriş başarısız.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  void _showSnackBar(String message, {bool isError = true}) {
+  void _showSnackBar(BuildContext context, String message, {bool isError = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
