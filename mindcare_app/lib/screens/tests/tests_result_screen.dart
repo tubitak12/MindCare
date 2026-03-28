@@ -406,35 +406,35 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (activity == 'Meditasyon')
-              Text('• 5-10 dakika sessiz bir yer bulun\n'
+              const Text('• 5-10 dakika sessiz bir yer bulun\n'
                   '• Rahat bir pozisyonda oturun\n'
                   '• Nefesinize odaklanın\n'
                   '• Düşünceleri yargılamadan izleyin'),
             if (activity == '4-7-8 Nefes')
-              Text('• 4 saniye nefes alın\n'
+              const Text('• 4 saniye nefes alın\n'
                   '• 7 saniye nefesi tutun\n'
                   '• 8 saniye nefesi verin\n'
                   '• 4-5 kez tekrarlayın'),
             if (activity == 'Kutu Nefesi')
-              Text('• 4 saniye nefes alın\n'
+              const Text('• 4 saniye nefes alın\n'
                   '• 4 saniye nefesi tutun\n'
                   '• 4 saniye nefesi verin\n'
                   '• 4 saniye bekleyin'),
             if (activity == 'Günlük')
-              Text('• Her gün aynı saatte yazın\n'
+              const Text('• Her gün aynı saatte yazın\n'
                   '• Duygularınızı özgürce ifade edin\n'
                   '• Minnettar olduğunuz şeyleri yazın'),
             if (activity == 'Yürüyüş')
-              Text('• Günde 20-30 dakika yürüyün\n'
+              const Text('• Günde 20-30 dakika yürüyün\n'
                   '• Doğal alanları tercih edin\n'
                   '• Telefonunuzu evde bırakın'),
             if (activity == 'Doğa Sesleri')
-              Text('• Rahat bir pozisyonda uzanın\n'
+              const Text('• Rahat bir pozisyonda uzanın\n'
                   '• Kulaklık takın\n'
                   '• Gözlerinizi kapatın\n'
                   '• Seslere odaklanın'),
             if (activity == 'Profesyonel Destek')
-              Text('• Psikolojik Destek Hattı: 183\n'
+              const Text('• Psikolojik Destek Hattı: 183\n'
                   '• Aile hekiminizden randevu alın\n'
                   '• Bir psikolog veya psikiyatrist bulun'),
           ],

@@ -456,13 +456,15 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
                   final isSelected = selectedAnswer == optionIndex;
 
                   String scoreText = '';
-                  if (optionIndex == 0)
+                  if (optionIndex == 0) {
                     scoreText = ' (0 puan)';
-                  else if (optionIndex == 1)
+                  } else if (optionIndex == 1) {
                     scoreText = ' (1 puan)';
-                  else if (optionIndex == 2)
+                  } else if (optionIndex == 2) {
                     scoreText = ' (2 puan)';
-                  else if (optionIndex == 3) scoreText = ' (3 puan)';
+                  } else if (optionIndex == 3) {
+                    scoreText = ' (3 puan)';
+                  }
 
                   return GestureDetector(
                     onTap: () => _selectAnswer(optionIndex),
@@ -566,9 +568,9 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(Icons.arrow_back, size: 18),
                         SizedBox(width: 4),
                         Text('Önceki'),

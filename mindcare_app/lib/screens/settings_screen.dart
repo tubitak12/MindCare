@@ -20,10 +20,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
+    return Scaffold(
+      backgroundColor: const Color(0xFFF0F7EE),
+      appBar: AppBar(
+        title: const Text('Ayarlar', style: TextStyle(color: Color(0xFF1B4332))),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF72B01D)),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
           _buildProfileCard(user),
           const SizedBox(height: 25),
           _buildSettingsGroup('Tercihler', [
@@ -63,6 +72,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildLogoutButton(),
         ],
       ),
+    ),
+  ),
     );
   }
 

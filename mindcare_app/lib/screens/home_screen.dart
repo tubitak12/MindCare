@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'activities_screen.dart';
-import 'tests/tests_category_screen.dart';
+import 'package:mindcare_app/screens/activities/activities_screen.dart';
+import 'package:mindcare_app/screens/tests/tests_category_screen.dart';
 import 'daily_screen.dart';
 import 'settings_screen.dart';
 import 'analytics_screen.dart';
@@ -297,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: _getPage(),
+      body: SafeArea(child: _getPage()),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,

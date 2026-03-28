@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tests_screen.dart';
@@ -30,7 +31,9 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
     try {
       final snapshot = await _firestore.collection('categories').get();
 
-      print('Kategori sayısı: ${snapshot.docs.length}'); // DEBUG
+      if (kDebugMode) {
+        debugPrint('Kategori sayısı: ${snapshot.docs.length}');
+      }
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -61,7 +64,9 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('HATA: $e'); // DEBUG
+      if (kDebugMode) {
+        debugPrint('HATA: $e');
+      }
       setState(() {
         _errorMessage =
             'Bağlantı hatası: $e\n\nFirebase kurallarını kontrol edin.';

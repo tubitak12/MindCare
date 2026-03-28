@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'breathing_exercise_screen.dart' as be; // alias be
 import 'box_breathing_screen.dart' as bb;      // alias bb
+import 'diaphragm_breathing_screen.dart' as db; // alias db
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
         children: [
           _buildCategoryCard(
             context,
@@ -87,7 +89,8 @@ class ActivitiesScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildCategoryCard(
@@ -202,6 +205,14 @@ class ActivitiesScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => const bb.BoxBreathingScreen(),
+              ),
+            );
+            break;
+          case 'Diyafram Nefesi':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const db.DiaphragmBreathingScreen(),
               ),
             );
             break;
