@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'breathing_exercise_screen.dart' as be; // alias be
-import 'box_breathing_screen.dart' as bb;      // alias bb
-import 'diaphragm_breathing_screen.dart' as db; // alias db
+import 'breathing_exercise_screen.dart' as be;
+import 'box_breathing_screen.dart' as bb;
+import 'diaphragm_breathing_screen.dart' as db;
+import 'motivation_wheel_screen.dart' as mw;
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
@@ -12,85 +13,85 @@ class ActivitiesScreen extends StatelessWidget {
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
-        children: [
-          _buildCategoryCard(
-            context,
-            'Meditasyon',
-            'Zihnini dinlendir',
-            Icons.self_improvement,
-            const Color(0xFF72B01D),
-            [
-              {
-                'title': '5 Dakika Nefes',
-                'duration': '5 dk',
-                'description': 'Derin nefes egzersizi'
-              },
-              {
-                'title': '10 Dakika Farkındalık',
-                'duration': '10 dk',
-                'description': 'Anı yaşama pratiği'
-              },
-              {
-                'title': 'Vücut Taraması',
-                'duration': '15 dk',
-                'description': 'Vücut farkındalığı'
-              },
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildCategoryCard(
-            context,
-            'Nefes Egzersizleri',
-            'Derin nefes al',
-            Icons.air,
-            const Color(0xFF72B01D),
-            [
-              {
-                'title': '4-7-8 Nefesi',
-                'duration': '2 dk',
-                'description': 'Rahatlatıcı nefes tekniği'
-              },
-              {
-                'title': 'Kutu Nefesi',
-                'duration': '3 dk', // 3 dk olarak ayarlandı
-                'description': 'Odaklanma için'
-              },
-              {
-                'title': 'Diyafram Nefesi',
-                'duration': '5 dk',
-                'description': 'Derin nefes alma'
-              },
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildCategoryCard(
-            context,
-            'Motivasyon',
-            'Kendine güç ver',
-            Icons.bolt,
-            const Color(0xFF72B01D),
-            [
-              {
-                'title': 'Günlük Motivasyon',
-                'duration': '3 dk',
-                'description': 'Pozitif düşünce'
-              },
-              {
-                'title': 'Başarı Hikayeleri',
-                'duration': '5 dk',
-                'description': 'İlham verici öyküler'
-              },
-              {
-                'title': 'Hedef Belirleme',
-                'duration': '7 dk',
-                'description': 'Kendine hedef koy'
-              },
-            ],
-          ),
-        ],
+          children: [
+            _buildCategoryCard(
+              context,
+              'Meditasyon',
+              'Zihnini dinlendir',
+              Icons.self_improvement,
+              const Color(0xFF72B01D),
+              [
+                {
+                  'title': '5 Dakika Nefes',
+                  'duration': '5 dk',
+                  'description': 'Derin nefes egzersizi'
+                },
+                {
+                  'title': '10 Dakika Farkındalık',
+                  'duration': '10 dk',
+                  'description': 'Anı yaşama pratiği'
+                },
+                {
+                  'title': 'Vücut Taraması',
+                  'duration': '15 dk',
+                  'description': 'Vücut farkındalığı'
+                },
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildCategoryCard(
+              context,
+              'Nefes Egzersizleri',
+              'Derin nefes al',
+              Icons.air,
+              const Color(0xFF72B01D),
+              [
+                {
+                  'title': '4-7-8 Nefesi',
+                  'duration': '2 dk',
+                  'description': 'Rahatlatıcı nefes tekniği'
+                },
+                {
+                  'title': 'Kutu Nefesi',
+                  'duration': '3 dk',
+                  'description': 'Odaklanma için'
+                },
+                {
+                  'title': 'Diyafram Nefesi',
+                  'duration': '5 dk',
+                  'description': 'Derin nefes alma'
+                },
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildCategoryCard(
+              context,
+              'Motivasyon',
+              'Kendine güç ver',
+              Icons.bolt,
+              const Color(0xFF72B01D),
+              [
+                {
+                  'title': 'Günlük Motivasyon',
+                  'duration': '', // ❌ kaldırıldı
+                  'description': 'Pozitif düşünce'
+                },
+                {
+                  'title': 'Başarı Hikayeleri',
+                  'duration': '5 dk',
+                  'description': 'İlham verici öyküler'
+                },
+                {
+                  'title': 'Hedef Belirleme',
+                  'duration': '7 dk',
+                  'description': 'Kendine hedef koy'
+                },
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 
   Widget _buildCategoryCard(
@@ -135,7 +136,8 @@ class ActivitiesScreen extends StatelessWidget {
                     ),
                     Text(
                       subtitle,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      style:
+                          const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ],
                 ),
@@ -179,24 +181,32 @@ class ActivitiesScreen extends StatelessWidget {
         description,
         style: const TextStyle(fontSize: 12, color: Colors.grey),
       ),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF0F7EE),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          duration,
-          style: const TextStyle(fontSize: 11, color: Color(0xFF72B01D)),
-        ),
-      ),
+
+      // ✅ Süre boşsa gösterme
+      trailing: duration.isNotEmpty
+          ? Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0F7EE),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                duration,
+                style: const TextStyle(
+                    fontSize: 11, color: Color(0xFF72B01D)),
+              ),
+            )
+          : null,
+
       onTap: () {
         switch (title) {
           case '4-7-8 Nefesi':
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const be.BreathingExerciseScreen(),
+                builder: (context) =>
+                    const be.BreathingExerciseScreen(),
               ),
             );
             break;
@@ -204,7 +214,8 @@ class ActivitiesScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const bb.BoxBreathingScreen(),
+                builder: (context) =>
+                    const bb.BoxBreathingScreen(),
               ),
             );
             break;
@@ -212,7 +223,17 @@ class ActivitiesScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const db.DiaphragmBreathingScreen(),
+                builder: (context) =>
+                    const db.DiaphragmBreathingScreen(),
+              ),
+            );
+            break;
+          case 'Günlük Motivasyon':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    const mw.MotivationWheelScreen(),
               ),
             );
             break;
@@ -221,7 +242,6 @@ class ActivitiesScreen extends StatelessWidget {
               SnackBar(
                 content: Text('$title aktivitesi yakında! 🧘'),
                 backgroundColor: const Color(0xFF72B01D),
-                behavior: SnackBarBehavior.fixed,
               ),
             );
         }
