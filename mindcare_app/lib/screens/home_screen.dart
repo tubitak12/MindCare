@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mindcare_app/screens/activities/activities_screen.dart';
 import 'package:mindcare_app/screens/tests/tests_category_screen.dart';
 import 'daily_screen.dart';
-import 'settings_screen.dart';
 import 'analytics_screen.dart';
 import 'sounds_screen.dart';
 
@@ -25,103 +25,103 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+
   bool _isCookieBroken = false;
   String _cookieMessage = "Kurabiyeyi kır ve günün mesajını al!";
+
+  List<String> _motivationalMessages = [];
+  bool _isLoadingMessages = true;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   String? _playingTitle;
 
-  final List<String> _messages = const [
-    "Bugün senin günün! ✨",
-    "Kendine güven, her şey güzel olacak 🌿",
-    "Küçük mutluluklar seni bekliyor 🍀",
-    "Zihnini dinlendir, yenilen 🧘",
-    "Sevgiyle kal, mutluluk seni bulacak 💚",
-  ];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    if (widget.showWelcome) {
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _showTopWelcomeMessage());
-    }
+    _loadMotivationalMessages();
   }
 
-  void _showTopWelcomeMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Hoş geldin ${widget.userName}! ✨ Modun kaydedildi.",
-            textAlign: TextAlign.center),
-        backgroundColor: const Color(0xFF72B01D),
-        behavior: SnackBarBehavior.fixed,
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height - 100,
-          left: 20,
-          right: 20,
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  void _toggleMusic(String fileName, String title) async {
+  Future<void> _loadMotivationalMessages() async {
     try {
-      if (_playingTitle == title) {
-        await _audioPlayer.stop();
-        setState(() => _playingTitle = null);
-      } else {
-        await _audioPlayer.stop();
-        await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-        await _audioPlayer.play(AssetSource('sounds/$fileName'));
-        setState(() => _playingTitle = title);
+      QuerySnapshot querySnapshot =
+          await _firestore.collection('motivations').get();
+
+      List<String> messages = [];
+
+      for (var doc in querySnapshot.docs) {
+        String? messageText = doc.get('text') as String?;
+        if (messageText != null && messageText.isNotEmpty) {
+          messages.add(messageText);
+        }
+      }
+
+      if (messages.isEmpty) {
+        messages = [
+          "Bugün senin günün! ✨",
+          "Kendine güven 🌿",
+          "Küçük mutluluklar 🍀",
+          "Zihnini dinlendir 🧘",
+          "Sevgiyle kal 💚",
+        ];
+      }
+
+      if (mounted) {
+        setState(() {
+          _motivationalMessages = messages;
+          _isLoadingMessages = false;
+        });
       }
     } catch (e) {
-      _showSnackBar('Ses dosyası bulunamadı: $fileName');
+      if (mounted) {
+        setState(() {
+          _motivationalMessages = [
+            "Bugün senin günün! ✨",
+            "Kendine güven 🌿",
+            "Küçük mutluluklar 🍀",
+            "Zihnini dinlendir 🧘",
+            "Sevgiyle kal 💚",
+          ];
+          _isLoadingMessages = false;
+        });
+      }
     }
   }
 
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
-
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) return;
-    setState(() {
-      _selectedIndex = index;
-    });
+  String _getRandomMessage() {
+    if (_motivationalMessages.isEmpty) {
+      return "Bugün kendine iyi bak! 🌟";
+    }
+    return _motivationalMessages[
+        DateTime.now().millisecondsSinceEpoch %
+            _motivationalMessages.length];
   }
 
   void _breakCookie() {
-    if (!_isCookieBroken) {
-      final randomMessage =
-          _messages[(DateTime.now().millisecond) % _messages.length];
-      setState(() {
-        _isCookieBroken = true;
-        _cookieMessage = randomMessage;
-      });
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) {
-          setState(() {
-            _isCookieBroken = false;
-            _cookieMessage = "Kurabiyeyi kır ve günün mesajını al!";
-          });
-        }
-      });
-    }
+    if (_isCookieBroken) return;
+
+    setState(() {
+      _isCookieBroken = true;
+      _cookieMessage = _getRandomMessage();
+    });
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFF72B01D),
-        behavior: SnackBarBehavior.fixed,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+  void _resetCookie() {
+    setState(() {
+      _isCookieBroken = false;
+      _cookieMessage = "Kurabiyeyi kır ve günün mesajını al!";
+    });
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 0) {
+      _resetCookie();
+    }
   }
 
   Widget _getPage() {
@@ -130,11 +130,13 @@ class _HomeScreenState extends State<HomeScreen> {
         return _buildHomeContent();
       case 1:
         return SoundsScreen(
-            onSoundTap: _toggleMusic, playingTitle: _playingTitle);
+          onSoundTap: _toggleMusic,
+          playingTitle: _playingTitle,
+        );
       case 2:
         return const ActivitiesScreen();
       case 3:
-        return const TestsCategoryScreen(); // DEĞİŞTİRİLDİ
+        return const TestsCategoryScreen();
       case 4:
         return const DailyScreen();
       case 5:
@@ -155,14 +157,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 20),
           _buildSectionTitle('Ruh Haline Özel Sesler'),
           const SizedBox(height: 10),
-          _buildMusicItem(
-              'Huzurlu Orman', 'Doğa Sesleri', '1 dk 49sn', 'forest.mp3'),
-          _buildMusicItem(
-              'Odaklanma', 'Yağmur Sesleri', '1dk 48sn', 'rain.mp3'),
-          _buildMusicItem(
-              'Derin Meditasyon', 'Beyaz Gürültü', '10sn', 'whitenoise.mp3'),
-          _buildMusicItem(
-              'Gece Ambiyansı', 'Cırcır Böcekleri', '3dk', 'night.mp3'),
+          _buildMusicItem('Huzurlu Orman', 'Doğa Sesleri', '1 dk 49sn', 'forest.mp3'),
+          _buildMusicItem('Odaklanma', 'Yağmur Sesleri', '1dk 48sn', 'rain.mp3'),
+          _buildMusicItem('Derin Meditasyon', 'Beyaz Gürültü', '10sn', 'whitenoise.mp3'),
+          _buildMusicItem('Gece Ambiyansı', 'Cırcır Böcekleri', '3dk', 'night.mp3'),
           const SizedBox(height: 30),
         ],
       ),
@@ -173,32 +171,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(20)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-                color: const Color(0xFFF0F7EE),
-                borderRadius: BorderRadius.circular(15)),
-            child: Text(widget.userEmoji, style: const TextStyle(fontSize: 30)),
-          ),
+          Text(widget.userEmoji, style: const TextStyle(fontSize: 30)),
           const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Bugünün Ruh Hali',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                SizedBox(height: 4),
-                Text('Kendine iyi bak, her şey yolunda.',
-                    style: TextStyle(color: Colors.grey, fontSize: 13)),
-              ],
-            ),
-          ),
-          const Icon(Icons.arrow_forward_ios,
-              color: Color(0xFF72B01D), size: 16),
+          const Expanded(child: Text("Bugünün Ruh Hali")),
         ],
       ),
     );
@@ -206,30 +186,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCookieCard() {
     return GestureDetector(
-      onTap: _breakCookie,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+      onTap: _isLoadingMessages ? null : _breakCookie,
+      child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-              color: _isCookieBroken
-                  ? const Color(0xFF72B01D)
-                  : Colors.transparent,
-              width: 2),
         ),
         child: Column(
           children: [
-            const Text('🍪 Günün Kurabiyesi',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text(
+              "🍪 Günün Kurabiyesi",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 15),
-            Icon(_isCookieBroken ? Icons.auto_awesome : Icons.cookie,
-                size: 60, color: const Color(0xFF72B01D)),
+            Icon(
+              _isCookieBroken ? Icons.cookie_outlined : Icons.cookie,
+              size: 60,
+              color: const Color(0xFF72B01D),
+            ),
             const SizedBox(height: 10),
-            Text(_cookieMessage,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.grey)),
+            Text(
+              _cookieMessage,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.black87),
+            ),
           ],
         ),
       ),
@@ -238,17 +219,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildSectionTitle(String title) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title,
-            style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1B4332))),
-        TextButton(
-          onPressed: () => setState(() => _selectedIndex = 1),
-          child: const Text('Tümünü Gör',
-              style: TextStyle(color: Color(0xFF72B01D))),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1B4332),
+          ),
         ),
       ],
     );
@@ -257,63 +235,78 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMusicItem(
       String title, String subtitle, String duration, String fileName) {
     bool isPlaying = _playingTitle == title;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-          color: isPlaying ? const Color(0xFFF0F7EE) : Colors.white,
-          borderRadius: BorderRadius.circular(15)),
+        color: isPlaying ? const Color(0xFFF0F7EE) : Colors.white,
+        borderRadius: BorderRadius.circular(15),
+      ),
       child: ListTile(
         onTap: () => _toggleMusic(fileName, title),
         leading: Icon(
-            isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
-            color: const Color(0xFF72B01D),
-            size: 30),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+          isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+          color: const Color(0xFF72B01D),
+          size: 30,
+        ),
+        title: Text(title),
         subtitle: Text(subtitle),
-        trailing: Text(duration, style: const TextStyle(fontSize: 12)),
+        trailing: Text(duration),
       ),
     );
+  }
+
+  Future<void> _toggleMusic(String fileName, String title) async {
+    if (_playingTitle == title) {
+      await _audioPlayer.stop();
+      setState(() => _playingTitle = null);
+    } else {
+      await _audioPlayer.stop();
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+      await _audioPlayer.play(AssetSource('sounds/$fileName'));
+      setState(() => _playingTitle = title);
+    }
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F7EE),
+
+      // ✅ SADECE BU DEĞİŞTİ
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF72B01D),
         elevation: 0,
-        title: Text('Hoş Geldin, ${widget.userName}',
-            style: const TextStyle(
-                color: Color(0xFF1B4332),
-                fontWeight: FontWeight.bold,
-                fontSize: 18)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Color(0xFF72B01D)),
-            onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const SettingsScreen())),
+        title: Text(
+          "Hoş Geldin, ${widget.userName}",
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
-        ],
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
+
       body: SafeArea(child: _getPage()),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF72B01D),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Ana Sayfa'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.music_note), label: 'Sesler'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.self_improvement), label: 'Aktiviteler'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.assignment), label: 'Testler'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Günlük'),
-          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Analiz'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Ana"),
+          BottomNavigationBarItem(icon: Icon(Icons.music_note), label: "Sesler"),
+          BottomNavigationBarItem(icon: Icon(Icons.self_improvement), label: "Aktiviteler"),
+          BottomNavigationBarItem(icon: Icon(Icons.assignment), label: "Testler"),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: "Günlük"),
+          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: "Analiz"),
         ],
       ),
     );

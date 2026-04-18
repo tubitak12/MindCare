@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'breathing_exercise_screen.dart' as be;
 import 'box_breathing_screen.dart' as bb;
 import 'diaphragm_breathing_screen.dart' as db;
-import 'motivation_wheel_screen.dart' as mw;
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
@@ -39,6 +38,7 @@ class ActivitiesScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
+
             _buildCategoryCard(
               context,
               'Nefes Egzersizleri',
@@ -60,31 +60,6 @@ class ActivitiesScreen extends StatelessWidget {
                   'title': 'Diyafram Nefesi',
                   'duration': '5 dk',
                   'description': 'Derin nefes alma'
-                },
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildCategoryCard(
-              context,
-              'Motivasyon',
-              'Kendine güç ver',
-              Icons.bolt,
-              const Color(0xFF72B01D),
-              [
-                {
-                  'title': 'Günlük Motivasyon',
-                  'duration': '', // ❌ kaldırıldı
-                  'description': 'Pozitif düşünce'
-                },
-                {
-                  'title': 'Başarı Hikayeleri',
-                  'duration': '5 dk',
-                  'description': 'İlham verici öyküler'
-                },
-                {
-                  'title': 'Hedef Belirleme',
-                  'duration': '7 dk',
-                  'description': 'Kendine hedef koy'
                 },
               ],
             ),
@@ -136,8 +111,10 @@ class ActivitiesScreen extends StatelessWidget {
                     ),
                     Text(
                       subtitle,
-                      style:
-                          const TextStyle(color: Colors.grey, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -169,36 +146,37 @@ class ActivitiesScreen extends StatelessWidget {
           color: const Color(0xFFF0F7EE),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Icon(Icons.play_circle_fill,
-            color: Color(0xFF72B01D), size: 24),
+        child: const Icon(
+          Icons.play_circle_fill,
+          color: Color(0xFF72B01D),
+          size: 24,
+        ),
       ),
       title: Text(
         title,
         style: const TextStyle(
-            fontWeight: FontWeight.w600, color: Color(0xFF1B4332)),
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF1B4332),
+        ),
       ),
       subtitle: Text(
         description,
         style: const TextStyle(fontSize: 12, color: Colors.grey),
       ),
-
-      // ✅ Süre boşsa gösterme
-      trailing: duration.isNotEmpty
-          ? Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF0F7EE),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                duration,
-                style: const TextStyle(
-                    fontSize: 11, color: Color(0xFF72B01D)),
-              ),
-            )
-          : null,
-
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF0F7EE),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          duration,
+          style: const TextStyle(
+            fontSize: 11,
+            color: Color(0xFF72B01D),
+          ),
+        ),
+      ),
       onTap: () {
         switch (title) {
           case '4-7-8 Nefesi':
@@ -210,6 +188,7 @@ class ActivitiesScreen extends StatelessWidget {
               ),
             );
             break;
+
           case 'Kutu Nefesi':
             Navigator.push(
               context,
@@ -219,6 +198,7 @@ class ActivitiesScreen extends StatelessWidget {
               ),
             );
             break;
+
           case 'Diyafram Nefesi':
             Navigator.push(
               context,
@@ -228,19 +208,11 @@ class ActivitiesScreen extends StatelessWidget {
               ),
             );
             break;
-          case 'Günlük Motivasyon':
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    const mw.MotivationWheelScreen(),
-              ),
-            );
-            break;
+
           default:
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('$title aktivitesi yakında! 🧘'),
+                content: Text('$title yakında eklenecek 🧘'),
                 backgroundColor: const Color(0xFF72B01D),
               ),
             );
