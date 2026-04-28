@@ -49,7 +49,7 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
     }
 
     if (!mounted) return;
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) => HomeScreen(
@@ -58,13 +58,14 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
           showWelcome: true,
         ),
       ),
+      (route) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(title: const Text('Ruh Halin'), backgroundColor: Colors.transparent, elevation: 0),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -87,16 +88,16 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFF72B01D).withValues(alpha: 26)
+                            ? const Color(0xFF10B981).withValues(alpha: 26)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: isSelected ? const Color(0xFF72B01D) : Colors.grey.shade200, width: 2),
+                        border: Border.all(color: isSelected ? const Color(0xFF10B981) : Colors.grey.shade200, width: 2),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(mood['emoji']!, style: const TextStyle(fontSize: 40)),
-                          Text(mood['label']!, style: TextStyle(color: isSelected ? const Color(0xFF1B4332) : Colors.grey)),
+                          Text(mood['label']!, style: TextStyle(color: isSelected ? const Color(0xFF064E3B) : Colors.grey)),
                         ],
                       ),
                     ),

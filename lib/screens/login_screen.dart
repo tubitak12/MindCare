@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (lastMoodDate == today) {
           // Bugün zaten mod seçilmiş, direkt ana sayfaya git (mesajsız)
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) => HomeScreen(
@@ -61,16 +61,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 showWelcome: false,
               ),
             ),
+            (route) => false,
           );
         } else {
           // Bugün mod seçilmemiş, mod ekranına git
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) => MoodSelectionScreen(
                 userName: user.displayName ?? 'Kullanıcı',
               ),
             ),
+            (route) => false,
           );
         }
       } else {
@@ -87,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.redAccent : const Color(0xFF72B01D),
+        backgroundColor: isError ? Colors.redAccent : const Color(0xFF10B981),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -96,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -105,8 +107,8 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 50),
-                const Icon(Icons.spa_rounded, color: Color(0xFF72B01D), size: 100),
-                const Text('MindCare', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Color(0xFF1B4332))),
+                const Icon(Icons.spa_rounded, color: Color(0xFF10B981), size: 100),
+                const Text('MindCare', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Color(0xFF064E3B))),
                 const SizedBox(height: 50),
                 TextFormField(
                   controller: _emailController,

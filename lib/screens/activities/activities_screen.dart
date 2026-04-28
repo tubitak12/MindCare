@@ -18,7 +18,7 @@ class ActivitiesScreen extends StatelessWidget {
               'Meditasyon',
               'Zihnini dinlendir',
               Icons.self_improvement,
-              const Color(0xFF72B01D),
+              const Color(0xFF10B981),
               [
                 {
                   'title': '5 Dakika Nefes',
@@ -44,7 +44,7 @@ class ActivitiesScreen extends StatelessWidget {
               'Nefes Egzersizleri',
               'Derin nefes al',
               Icons.air,
-              const Color(0xFF72B01D),
+              const Color(0xFF10B981),
               [
                 {
                   'title': '4-7-8 Nefesi',
@@ -106,13 +106,13 @@ class ActivitiesScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1B4332),
+                        color: Color(0xFF064E3B),
                       ),
                     ),
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        color: Colors.grey,
+                        color: const Color(0xFF6B7280),
                         fontSize: 12,
                       ),
                     ),
@@ -143,12 +143,12 @@ class ActivitiesScreen extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color(0xFFF0F7EE),
+          color: const Color(0xFFF0FDF4),
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Icon(
           Icons.play_circle_fill,
-          color: Color(0xFF72B01D),
+          color: Color(0xFF10B981),
           size: 24,
         ),
       ),
@@ -156,24 +156,24 @@ class ActivitiesScreen extends StatelessWidget {
         title,
         style: const TextStyle(
           fontWeight: FontWeight.w600,
-          color: Color(0xFF1B4332),
+          color: Color(0xFF064E3B),
         ),
       ),
       subtitle: Text(
         description,
-        style: const TextStyle(fontSize: 12, color: Colors.grey),
+        style: const TextStyle(fontSize: 12, color: const Color(0xFF6B7280)),
       ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFFF0F7EE),
+          color: const Color(0xFFF0FDF4),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           duration,
           style: const TextStyle(
             fontSize: 11,
-            color: Color(0xFF72B01D),
+            color: Color(0xFF10B981),
           ),
         ),
       ),
@@ -213,7 +213,7 @@ class ActivitiesScreen extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('$title yakında eklenecek 🧘'),
-                backgroundColor: const Color(0xFF72B01D),
+                backgroundColor: const Color(0xFF10B981),
               ),
             );
         }

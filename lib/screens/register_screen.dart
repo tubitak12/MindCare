@@ -44,9 +44,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF72B01D),
+              primary: Color(0xFF10B981),
               onPrimary: Colors.white,
-              onSurface: Color(0xFF1B4332),
+              onSurface: Color(0xFF064E3B),
             ),
           ),
           child: child!,
@@ -89,13 +89,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       _showSnackBar('Kayıt başarılı! 🌿', isError: false);
 
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (context) => InfoFlowScreen(
             userName: _nameController.text.trim(),
           ),
         ),
+        (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       String message;
@@ -124,7 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.redAccent : const Color(0xFF72B01D),
+        backgroundColor: isError ? Colors.redAccent : const Color(0xFF10B981),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -133,15 +134,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: const Text(
           'Kayıt Ol',
-          style: TextStyle(color: Color(0xFF1B4332)),
+          style: TextStyle(color: Color(0xFF064E3B)),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF72B01D)),
+        iconTheme: const IconThemeData(color: Color(0xFF10B981)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -152,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 const Text(
                   'MindCare ailesine katıl! ✨',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: TextStyle(fontSize: 18, color: const Color(0xFF6B7280)),
                 ),
                 const SizedBox(height: 30),
 
@@ -165,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: const InputDecoration(
                     labelText: 'Ad Soyad',
                     prefixIcon:
-                        Icon(Icons.person_outline, color: Color(0xFF72B01D)),
+                        Icon(Icons.person_outline, color: Color(0xFF10B981)),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -182,7 +183,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Doğum Tarihi',
                         prefixIcon: Icon(Icons.calendar_today_outlined,
-                            color: Color(0xFF72B01D)),
+                            color: Color(0xFF10B981)),
                       ),
                     ),
                   ),
@@ -203,7 +204,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: const InputDecoration(
                     labelText: 'E-posta',
                     prefixIcon:
-                        Icon(Icons.email_outlined, color: Color(0xFF72B01D)),
+                        Icon(Icons.email_outlined, color: Color(0xFF10B981)),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -218,7 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Şifre',
                     prefixIcon: const Icon(Icons.lock_outline,
-                        color: Color(0xFF72B01D)),
+                        color: Color(0xFF10B981)),
                     suffixIcon: IconButton(
                       icon: Icon(_isObscure1
                           ? Icons.visibility_off
@@ -239,7 +240,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Şifre Tekrar',
                     prefixIcon: const Icon(Icons.lock_outline,
-                        color: Color(0xFF72B01D)),
+                        color: Color(0xFF10B981)),
                     suffixIcon: IconButton(
                       icon: Icon(_isObscure2
                           ? Icons.visibility_off
@@ -252,7 +253,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 30),
 
                 if (_isLoading)
-                  const CircularProgressIndicator(color: Color(0xFF72B01D))
+                  const CircularProgressIndicator(color: Color(0xFF10B981))
                 else
                   ElevatedButton(
                     onPressed: _handleRegister,
@@ -264,7 +265,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
                     'Zaten hesabın var mı? Giriş Yap',
-                    style: TextStyle(color: Color(0xFF72B01D)),
+                    style: TextStyle(color: Color(0xFF10B981)),
                   ),
                 ),
               ],

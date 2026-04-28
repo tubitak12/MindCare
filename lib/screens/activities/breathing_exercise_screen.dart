@@ -117,9 +117,9 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
   Color get _phaseColor {
     switch (_phase) {
       case _BreathPhase.inhale:
-        return const Color(0xFF72B01D);
+        return const Color(0xFF10B981);
       case _BreathPhase.hold:
-        return const Color(0xFF1B4332);
+        return const Color(0xFF064E3B);
       case _BreathPhase.exhale:
         return const Color(0xFF4E8A3A);
       case _BreathPhase.finished:
@@ -150,10 +150,10 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: const Text("4-7-8 Nefes"),
-        backgroundColor: const Color(0xFF72B01D),
+        backgroundColor: const Color(0xFF10B981),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),

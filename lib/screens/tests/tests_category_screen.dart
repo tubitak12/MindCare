@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tests_screen.dart';
@@ -97,7 +97,7 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,14 +112,14 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1B4332),
+                      color: Color(0xFF064E3B),
                     ),
                   ),
                   SizedBox(height: 8),
                   Text(
                     'Kendini daha iyi tanımak için bir kategori seç',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: const Color(0xFF6B7280),
                       fontSize: 14,
                     ),
                   ),
@@ -141,7 +141,7 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: Color(0xFF72B01D)),
+            CircularProgressIndicator(color: Color(0xFF10B981)),
             SizedBox(height: 16),
             Text('Kategoriler yükleniyor...'),
           ],
@@ -167,7 +167,7 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
               ElevatedButton(
                 onPressed: _loadCategories,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF72B01D),
+                  backgroundColor: const Color(0xFF10B981),
                 ),
                 child: const Text('Tekrar Dene'),
               ),
@@ -182,7 +182,7 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.category, size: 60, color: Colors.grey),
+            Icon(Icons.category, size: 60, color: const Color(0xFF6B7280)),
             SizedBox(height: 16),
             Text('Henüz kategori eklenmemiş'),
             SizedBox(height: 8),
@@ -284,7 +284,7 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1B4332),
+                color: Color(0xFF064E3B),
               ),
               textAlign: TextAlign.center,
             ),
@@ -295,7 +295,7 @@ class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
                 description,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+                  color: const Color(0xFF6B7280),
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

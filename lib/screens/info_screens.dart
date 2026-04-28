@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'mood_selection_screen.dart';
 
 class InfoFlowScreen extends StatefulWidget {
@@ -38,7 +38,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -83,9 +83,9 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
                                 _animationController.forward();
                               },
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: const Color(0xFF72B01D),
+                                foregroundColor: const Color(0xFF10B981),
                                 side:
-                                    const BorderSide(color: Color(0xFF72B01D)),
+                                    const BorderSide(color: Color(0xFF10B981)),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
@@ -111,13 +111,14 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
                                 _animationController.reset();
                                 _animationController.forward();
                               } else {
-                                Navigator.pushReplacement(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => MoodSelectionScreen(
                                       userName: widget.userName,
                                     ),
                                   ),
+                                  (route) => false,
                                 );
                               }
                             },
@@ -151,14 +152,14 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1B4332),
+            color: Color(0xFF064E3B),
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
         const Text(
           "İlgilendiğiniz alanları seçin",
-          style: TextStyle(color: Colors.grey, fontSize: 14),
+          style: TextStyle(color: const Color(0xFF6B7280), fontSize: 14),
         ),
         const SizedBox(height: 30),
 
@@ -187,7 +188,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
               width: 30,
               height: 8,
               decoration: BoxDecoration(
-                color: const Color(0xFF72B01D),
+                color: const Color(0xFF10B981),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -196,7 +197,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
               width: 8,
               height: 8,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: const Color(0xFF6B7280),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -221,12 +222,12 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF0F7EE),
+                  color: Color(0xFFF0FDF4),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.check_circle,
-                  color: Color(0xFF72B01D),
+                  color: Color(0xFF10B981),
                   size: 70,
                 ),
               ),
@@ -241,7 +242,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1B4332),
+            color: Color(0xFF064E3B),
           ),
         ),
 
@@ -250,14 +251,14 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0F7EE),
+            color: const Color(0xFFF0FDF4),
             borderRadius: BorderRadius.circular(30),
           ),
           child: Text(
             widget.userName,
             style: const TextStyle(
               fontSize: 18,
-              color: Color(0xFF72B01D),
+              color: Color(0xFF10B981),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -270,7 +271,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
           child: Text(
             "Size özel kişiselleştirilmiş bir deneyim hazırladık. Ruh halinize uygun aktiviteler, testler ve daha fazlası sizi bekliyor.",
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey, height: 1.5),
+            style: TextStyle(color: const Color(0xFF6B7280), height: 1.5),
           ),
         ),
 
@@ -296,7 +297,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
               width: 8,
               height: 8,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: const Color(0xFF6B7280),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -305,7 +306,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
               width: 30,
               height: 8,
               decoration: BoxDecoration(
-                color: const Color(0xFF72B01D),
+                color: const Color(0xFF10B981),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -320,10 +321,10 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
       width: 100,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F7EE).withValues(alpha: 0.5),
+        color: const Color(0xFFF0FDF4).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: const Color(0xFF72B01D).withValues(alpha: 0.2),
+          color: const Color(0xFF10B981).withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -334,7 +335,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
             text,
             style: const TextStyle(
               fontSize: 12,
-              color: Color(0xFF1B4332),
+              color: Color(0xFF064E3B),
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
@@ -350,15 +351,15 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0F7EE),
+            color: const Color(0xFFF0FDF4),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: const Color(0xFF72B01D), size: 20),
+          child: Icon(icon, color: const Color(0xFF10B981), size: 20),
         ),
         const SizedBox(height: 5),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: Colors.grey),
+          style: const TextStyle(fontSize: 11, color: const Color(0xFF6B7280)),
         ),
       ],
     );

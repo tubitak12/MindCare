@@ -114,10 +114,10 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
   Color get _phaseColor {
     switch (_phase) {
       case _BoxBreathPhase.inhale:
-        return const Color(0xFF72B01D);
+        return const Color(0xFF10B981);
       case _BoxBreathPhase.hold:
       case _BoxBreathPhase.holdAfterExhale:
-        return const Color(0xFF1B4332);
+        return const Color(0xFF064E3B);
       case _BoxBreathPhase.exhale:
         return const Color(0xFF4E8A3A);
       case _BoxBreathPhase.finished:
@@ -137,10 +137,10 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: const Text("Kutu Nefesi"),
-        backgroundColor: const Color(0xFF72B01D),
+        backgroundColor: const Color(0xFF10B981),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),

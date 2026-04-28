@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -134,7 +134,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         ],
         activities: ['Meditasyon', 'Yürüyüş', 'Günlük'],
         quote: 'Kendinle barışık olmak, dünyayla barışık olmanın ilk adımıdır.',
-        color: const Color(0xFF72B01D),
+        color: const Color(0xFF10B981),
       );
     } else if (widget.score <= 9) {
       return ResultData(
@@ -199,7 +199,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         ],
         activities: ['Günlük', 'Meditasyon', 'Sesli Kitap'],
         quote: 'Mutluluk bir yolculuktur, varış noktası değil.',
-        color: const Color(0xFF72B01D),
+        color: const Color(0xFF10B981),
       );
     } else if (widget.score <= 9) {
       return ResultData(
@@ -280,7 +280,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         ],
         activities: ['Meditasyon', 'Yürüyüş', 'Kitap Okuma'],
         quote: 'Denge, hayatın en güzel halidir.',
-        color: const Color(0xFF72B01D),
+        color: const Color(0xFF10B981),
       );
     } else if (widget.score <= 26) {
       return ResultData(
@@ -331,7 +331,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         ],
         activities: ['Meditasyon', 'Günlük', 'Motivasyon'],
         quote: 'İyilik, paylaştıkça çoğalır.',
-        color: const Color(0xFF72B01D),
+        color: const Color(0xFF10B981),
       );
     } else if (percentage >= 50) {
       return ResultData(
@@ -385,7 +385,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
       ],
       activities: ['Meditasyon', 'Günlük', 'Yürüyüş'],
       quote: 'Kendini tanımak, iyileşmenin ilk adımıdır.',
-      color: const Color(0xFF72B01D),
+      color: const Color(0xFF10B981),
     );
   }
 
@@ -443,7 +443,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child:
-                const Text('Kapat', style: TextStyle(color: Color(0xFF72B01D))),
+                const Text('Kapat', style: TextStyle(color: Color(0xFF10B981))),
           ),
         ],
       ),
@@ -455,11 +455,11 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
     final result = _getResultData();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: Text(
           '${widget.testName} Sonucu',
-          style: const TextStyle(color: Color(0xFF1B4332)),
+          style: const TextStyle(color: Color(0xFF064E3B)),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -472,7 +472,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
       ),
       body: _isSaving
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF72B01D)))
+              child: CircularProgressIndicator(color: Color(0xFF10B981)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -515,14 +515,14 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                               style: const TextStyle(
                                 fontSize: 48,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1B4332),
+                                color: Color(0xFF064E3B),
                               ),
                             ),
                             Text(
                               ' / ${widget.maxScore}',
                               style: const TextStyle(
                                 fontSize: 24,
-                                color: Colors.grey,
+                                color: const Color(0xFF6B7280),
                               ),
                             ),
                           ],
@@ -558,7 +558,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1B4332),
+                            color: Color(0xFF064E3B),
                             height: 1.4,
                           ),
                           textAlign: TextAlign.center,
@@ -568,7 +568,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                           result.description,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade600,
+                            color: const Color(0xFF6B7280),
                             height: 1.4,
                           ),
                           textAlign: TextAlign.center,
@@ -598,7 +598,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1B4332),
+                                color: Color(0xFF064E3B),
                               ),
                             ),
                           ],
@@ -623,7 +623,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                                       suggestion,
                                       style: const TextStyle(
                                         fontSize: 14,
-                                        color: Color(0xFF1B4332),
+                                        color: Color(0xFF064E3B),
                                       ),
                                     ),
                                   ),
@@ -655,7 +655,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1B4332),
+                                color: Color(0xFF064E3B),
                               ),
                             ),
                           ],
@@ -724,14 +724,14 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                     ),
                     child: Column(
                       children: [
-                        const Icon(Icons.format_quote, color: Colors.grey),
+                        const Icon(Icons.format_quote, color: const Color(0xFF6B7280)),
                         const SizedBox(height: 8),
                         Text(
                           result.quote,
                           style: const TextStyle(
                             fontSize: 16,
                             fontStyle: FontStyle.italic,
-                            color: Color(0xFF1B4332),
+                            color: Color(0xFF064E3B),
                             height: 1.4,
                           ),
                           textAlign: TextAlign.center,

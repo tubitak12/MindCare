@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'tests_result_screen.dart';
@@ -219,11 +219,11 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: Text(
           widget.testTitle,
-          style: const TextStyle(color: Color(0xFF1B4332)),
+          style: const TextStyle(color: Color(0xFF064E3B)),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -234,7 +234,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF72B01D)))
+              child: CircularProgressIndicator(color: Color(0xFF10B981)))
           : _questions.isEmpty
               ? _buildEmptyState()
               : _testCompleted
@@ -259,7 +259,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
           const SizedBox(height: 8),
           Text(
             'Lütfen daha sonra tekrar deneyin',
-            style: TextStyle(color: Colors.grey.shade600),
+            style: TextStyle(color: const Color(0xFF6B7280)),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -306,7 +306,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1B4332),
+                color: Color(0xFF064E3B),
               ),
               textAlign: TextAlign.center,
             ),
@@ -330,13 +330,13 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
             const Text(
               'Her soruyu dikkatlice okuyun ve size en uygun seçeneği işaretleyin.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, height: 1.4),
+              style: TextStyle(color: const Color(0xFF6B7280), height: 1.4),
             ),
             const SizedBox(height: 16),
             Text(
               'Cevaplarınız gizli tutulacaktır.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+              style: TextStyle(color: const Color(0xFF6B7280), fontSize: 12),
             ),
             const SizedBox(height: 40),
             SizedBox(
@@ -383,12 +383,12 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
                     'Soru ${_currentQuestionIndex + 1}/${_questions.length}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1B4332),
+                      color: Color(0xFF064E3B),
                     ),
                   ),
                   Text(
                     '${((_currentQuestionIndex + 1) / _questions.length * 100).toInt()}%',
-                    style: const TextStyle(color: Colors.grey),
+                    style: const TextStyle(color: const Color(0xFF6B7280)),
                   ),
                 ],
               ),
@@ -432,7 +432,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1B4332),
+                      color: Color(0xFF064E3B),
                       height: 1.4,
                     ),
                   ),
@@ -444,7 +444,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
                   'Size en uygun seçeneği işaretleyin',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey,
+                    color: const Color(0xFF6B7280),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -524,7 +524,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
                                     : FontWeight.normal,
                                 color: isSelected
                                     ? widget.testColor
-                                    : const Color(0xFF1B4332),
+                                    : const Color(0xFF064E3B),
                               ),
                             ),
                           ),

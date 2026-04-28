@@ -95,11 +95,11 @@ class _DiaphragmBreathingScreenState extends State<DiaphragmBreathingScreen> {
   Color get _phaseColor {
     switch (_phase) {
       case _DiaphragmPhase.inhale:
-        return const Color(0xFF72B01D);
+        return const Color(0xFF10B981);
       case _DiaphragmPhase.exhale:
         return const Color(0xFF4E8A3A);
       case _DiaphragmPhase.finished:
-        return const Color(0xFF1B4332);
+        return const Color(0xFF064E3B);
     }
   }
 
@@ -134,14 +134,14 @@ class _DiaphragmBreathingScreenState extends State<DiaphragmBreathingScreen> {
         children: [
           const Text(
             '• ',
-            style: TextStyle(fontSize: 16, color: Color(0xFF1B4332)),
+            style: TextStyle(fontSize: 16, color: Color(0xFF064E3B)),
           ),
           Expanded(
             child: Text(
               text,
               style: const TextStyle(
                 fontSize: 14,
-                color: Color(0xFF1B4332),
+                color: Color(0xFF064E3B),
                 height: 1.8,
               ),
             ),
@@ -154,10 +154,10 @@ class _DiaphragmBreathingScreenState extends State<DiaphragmBreathingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: const Text('Diyafram Nefesi'),
-        backgroundColor: const Color(0xFF72B01D),
+        backgroundColor: const Color(0xFF10B981),
       ),
       body: SafeArea(
         child: Padding(
@@ -188,7 +188,7 @@ class _DiaphragmBreathingScreenState extends State<DiaphragmBreathingScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1B4332),
+                          color: Color(0xFF064E3B),
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -250,7 +250,7 @@ class _DiaphragmBreathingScreenState extends State<DiaphragmBreathingScreen> {
                               child: CircularProgressIndicator(
                                 value: _progressValue,
                                 strokeWidth: 10,
-                                color: const Color(0xFF72B01D),
+                                color: const Color(0xFF10B981),
                                 backgroundColor: const Color(0xFFE0F2F1),
                               ),
                             ),

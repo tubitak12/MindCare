@@ -107,7 +107,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         title: Text(
           title,
           style: TextStyle(
-            color: isSuccess ? const Color(0xFF72B01D) : Colors.redAccent,
+            color: isSuccess ? const Color(0xFF10B981) : Colors.redAccent,
           ),
         ),
         content: Text(message),
@@ -129,15 +129,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: const Text(
           'Şifre Sıfırlama',
-          style: TextStyle(color: Color(0xFF1B4332)),
+          style: TextStyle(color: Color(0xFF064E3B)),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF72B01D)),
+        iconTheme: const IconThemeData(color: Color(0xFF10B981)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -157,7 +157,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   child: const Icon(
                     Icons.lock_reset_rounded,
-                    color: Color(0xFF72B01D),
+                    color: Color(0xFF10B981),
                     size: 60,
                   ),
                 ),
@@ -169,7 +169,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1B4332),
+                    color: Color(0xFF064E3B),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -180,7 +180,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: Text(
                     'E-posta adresinizi yazın, size şifre yenileme bağlantısı gönderelim.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                    style: TextStyle(color: const Color(0xFF6B7280), fontSize: 14),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -201,7 +201,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   decoration: const InputDecoration(
                     labelText: 'E-posta Adresiniz',
                     prefixIcon:
-                        Icon(Icons.email_outlined, color: Color(0xFF72B01D)),
+                        Icon(Icons.email_outlined, color: Color(0xFF10B981)),
                     hintText: 'ornek@email.com',
                   ),
                 ),
@@ -209,7 +209,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // Gönder butonu
                 if (_isLoading)
-                  const CircularProgressIndicator(color: Color(0xFF72B01D))
+                  const CircularProgressIndicator(color: Color(0xFF10B981))
                 else
                   ElevatedButton(
                     onPressed: _resetPassword,
@@ -222,7 +222,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
                     'Giriş ekranına dön',
-                    style: TextStyle(color: Color(0xFF72B01D)),
+                    style: TextStyle(color: Color(0xFF10B981)),
                   ),
                 ),
               ],

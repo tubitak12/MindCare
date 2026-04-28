@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tests_detail_screen.dart';
 
@@ -26,12 +26,12 @@ class _TestsScreenState extends State<TestsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: Text(
           widget.categoryName,
           style: const TextStyle(
-            color: Color(0xFF1B4332),
+            color: Color(0xFF064E3B),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -68,7 +68,7 @@ class _TestsScreenState extends State<TestsScreen> {
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF72B01D)),
+              child: CircularProgressIndicator(color: Color(0xFF10B981)),
             );
           }
 
@@ -86,7 +86,7 @@ class _TestsScreenState extends State<TestsScreen> {
                   Text(
                     'Bu kategoride henüz test yok',
                     style: TextStyle(
-                      color: Colors.grey.shade600,
+                      color: const Color(0xFF6B7280),
                       fontSize: 16,
                     ),
                   ),
@@ -94,7 +94,7 @@ class _TestsScreenState extends State<TestsScreen> {
                   Text(
                     'Yakında eklenecek',
                     style: TextStyle(
-                      color: Colors.grey.shade500,
+                      color: const Color(0xFF6B7280),
                       fontSize: 14,
                     ),
                   ),
@@ -187,7 +187,7 @@ class _TestsScreenState extends State<TestsScreen> {
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
-              color: Color(0xFF1B4332),
+              color: Color(0xFF064E3B),
             ),
           ),
           subtitle: Column(
@@ -196,14 +196,14 @@ class _TestsScreenState extends State<TestsScreen> {
               const SizedBox(height: 4),
               Text(
                 description,
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
+                style: const TextStyle(color: const Color(0xFF6B7280), fontSize: 13),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
               Text(
                 '$questionCount soru',
-                style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                style: TextStyle(color: const Color(0xFF6B7280), fontSize: 12),
               ),
             ],
           ),

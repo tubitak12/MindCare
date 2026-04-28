@@ -33,8 +33,8 @@ class MindCareApp extends StatelessWidget {
   }
 
   ThemeData _buildTheme() {
-    const primaryColor = Color(0xFF72B01D);
-    const bgColor = Color(0xFFF0F7EE);
+    const primaryColor = Color(0xFF10B981);
+    const bgColor = Color(0xFFF0FDF4);
 
     return ThemeData(
       useMaterial3: true,

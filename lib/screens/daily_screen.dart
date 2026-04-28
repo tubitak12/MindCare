@@ -12,6 +12,7 @@ class DailyScreen extends StatefulWidget {
 }
 
 class _DailyScreenState extends State<DailyScreen> {
+  final _titleController = TextEditingController();
   final _entryController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -21,14 +22,13 @@ class _DailyScreenState extends State<DailyScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String _selectedMood = '😐';
-  bool _isPrivate = false;
+  // Tasarımda emoji yok, ancak veritabanı yapısını bozmamak için varsayılan bir değer atıyoruz
+  final String _selectedMood = '😐'; 
+  bool _isPrivate = true; // Tasarımda switch yok, her şeyi private sayalım
   bool _isFirstTime = false; // İlk kez mi giriliyor?
   bool _isPasswordScreen = true; // Şifre ekranında mı?
   bool _isLoading = false;
   String? _errorMessage;
-
-  final List<String> _moods = ['😢', '😔', '😐', '🙂', '😊', '😁'];
 
   @override
   void initState() {
@@ -38,6 +38,7 @@ class _DailyScreenState extends State<DailyScreen> {
 
   @override
   void dispose() {
+    _titleController.dispose();
     _entryController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -117,7 +118,7 @@ class _DailyScreenState extends State<DailyScreen> {
   // Günlüğü Firebase'e kaydet
   Future<void> _saveDiary() async {
     if (_entryController.text.trim().isEmpty) {
-      _showSnackBar('Lütfen bir şeyler yazın! 📝');
+      _showSnackBar('Lütfen bir içerik yazın! 📝');
       return;
     }
 
@@ -130,29 +131,39 @@ class _DailyScreenState extends State<DailyScreen> {
         return;
       }
 
-      // Şifreyi al
       final diaryPassword = await _encryptionService.getDiaryPassword();
       if (diaryPassword == null) {
         _showSnackBar('Şifre bulunamadı!');
         return;
       }
 
-      // Günlük içeriğini şifrele
+      // İçerikleri şifrele
       final encryptedContent = _encryptionService.encryptText(
         _entryController.text.trim(),
         diaryPassword,
       );
+      
+      final titleText = _titleController.text.trim().isNotEmpty 
+          ? _titleController.text.trim() 
+          : 'İsimsiz Günlük';
+          
+      final encryptedTitle = _encryptionService.encryptText(
+        titleText,
+        diaryPassword,
+      );
 
       final now = DateTime.now();
+      // Rastgele ID oluştur (Aynı gün birden fazla günlük atılabilir diye)
+      final docId = _firestore.collection('users').doc(userId).collection('diaries').doc().id;
       final dateKey = DateFormat('yyyy-MM-dd').format(now);
 
-      // Firebase'e kaydet
       await _firestore
           .collection('users')
           .doc(userId)
           .collection('diaries')
-          .doc(dateKey)
+          .doc(docId)
           .set({
+        'title': encryptedTitle, // Yeni eklenen başlık
         'content': encryptedContent,
         'mood': _selectedMood,
         'isPrivate': _isPrivate,
@@ -161,6 +172,7 @@ class _DailyScreenState extends State<DailyScreen> {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
+      _titleController.clear();
       _entryController.clear();
       _showSnackBar('Günlük kaydedildi! 📝✨', isError: false);
     } catch (e) {
@@ -170,176 +182,27 @@ class _DailyScreenState extends State<DailyScreen> {
     }
   }
 
-  // Günlükleri göster (şifreli)
-  void _showHistory() async {
-    final userId = _auth.currentUser?.uid;
-    if (userId == null) return;
-
-    final diaryPassword = await _encryptionService.getDiaryPassword();
-    if (diaryPassword == null) return;
-
-    if (!mounted) return;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        height: MediaQuery.of(context).size.height * 0.8,
-        child: Column(
-          children: [
-            const Text(
-              'Geçmiş Günlükler',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B4332)),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection('users')
-                    .doc(userId)
-                    .collection('diaries')
-                    .orderBy('date', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Hata: ${snapshot.error}'));
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                        child: CircularProgressIndicator(
-                            color: Color(0xFF72B01D)));
-                  }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.book, size: 50, color: Colors.grey),
-                          SizedBox(height: 10),
-                          Text('Henüz günlük kaydı yok',
-                              style: TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final diaries = snapshot.data!.docs;
-                  return ListView.builder(
-                    itemCount: diaries.length,
-                    itemBuilder: (context, index) {
-                      final diary = diaries[index];
-                      final data = diary.data() as Map<String, dynamic>;
-                      final date = (data['date'] as Timestamp).toDate();
-                      final mood = data['mood'] ?? '😐';
-                      final encryptedContent = data['content'] ?? '';
-
-                      // Şifreli içeriği çöz
-                      String decryptedContent = 'İçerik çözülemedi';
-                      try {
-                        decryptedContent = _encryptionService.decryptText(
-                          encryptedContent,
-                          diaryPassword,
-                        );
-                      } catch (e) {
-                        decryptedContent = '🔒 Şifreli içerik';
-                      }
-
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        child: ListTile(
-                          leading:
-                              Text(mood, style: const TextStyle(fontSize: 24)),
-                          title: Text(
-                            DateFormat('dd MMMM yyyy', 'tr').format(date),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            decryptedContent.length > 100
-                                ? '${decryptedContent.substring(0, 100)}...'
-                                : decryptedContent,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          trailing: data['isPrivate'] == true
-                              ? const Icon(Icons.lock,
-                                  color: Colors.grey, size: 16)
-                              : null,
-                          onTap: () {
-                            Navigator.pop(context);
-                            _showDiaryDetail(date, mood, decryptedContent,
-                                data['isPrivate'] ?? false);
-                          },
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Günlük detayını göster
-  void _showDiaryDetail(
-      DateTime date, String mood, String content, bool isPrivate) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Text(mood, style: const TextStyle(fontSize: 30)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                DateFormat('dd MMMM yyyy', 'tr').format(date),
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-            if (isPrivate) const Icon(Icons.lock, color: Colors.grey, size: 16),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Text(
-            content,
-            style: const TextStyle(height: 1.5),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:
-                const Text('Kapat', style: TextStyle(color: Color(0xFF72B01D))),
-          ),
-        ],
-      ),
-    );
+  void _lockDiary() {
+    setState(() {
+      _isPasswordScreen = true;
+      _passwordController.clear();
+      if (_isFirstTime) {
+        _confirmPasswordController.clear();
+      }
+    });
   }
 
   void _showSnackBar(String message, {bool isError = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.redAccent : const Color(0xFF72B01D),
+        backgroundColor: isError ? Colors.redAccent : const Color(0xFF10B981),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  // Şifre ekranı
+  // Şifre ekranı (mevcut tasarımı koruyoruz)
   Widget _buildPasswordScreen() {
     return Center(
       child: SingleChildScrollView(
@@ -357,7 +220,7 @@ class _DailyScreenState extends State<DailyScreen> {
                 ),
                 child: Icon(
                   _isFirstTime ? Icons.lock_outline : Icons.lock,
-                  color: const Color(0xFF72B01D),
+                  color: const Color(0xFF10B981),
                   size: 60,
                 ),
               ),
@@ -367,7 +230,7 @@ class _DailyScreenState extends State<DailyScreen> {
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B4332),
+                  color: Color(0xFF064E3B),
                 ),
               ),
               const SizedBox(height: 10),
@@ -376,7 +239,7 @@ class _DailyScreenState extends State<DailyScreen> {
                     ? 'Günlüklerinizi korumak için bir şifre belirleyin'
                     : 'Günlüklerinizi görüntülemek için şifrenizi girin',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.grey),
+                style: const TextStyle(color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 30),
               TextFormField(
@@ -389,10 +252,15 @@ class _DailyScreenState extends State<DailyScreen> {
                   }
                   return null;
                 },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Şifre',
-                  prefixIcon:
-                      Icon(Icons.lock_outline, color: Color(0xFF72B01D)),
+                  prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF10B981)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
               ),
               if (_isFirstTime) ...[
@@ -404,10 +272,15 @@ class _DailyScreenState extends State<DailyScreen> {
                     if (v == null || v.isEmpty) return 'Şifre tekrarı gerekli';
                     return null;
                   },
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Şifre Tekrar',
-                    prefixIcon:
-                        Icon(Icons.lock_outline, color: Color(0xFF72B01D)),
+                    prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF10B981)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ],
@@ -420,11 +293,24 @@ class _DailyScreenState extends State<DailyScreen> {
               ],
               const SizedBox(height: 30),
               if (_isLoading)
-                const CircularProgressIndicator(color: Color(0xFF72B01D))
+                const CircularProgressIndicator(color: Color(0xFF10B981))
               else
-                ElevatedButton(
-                  onPressed: _isFirstTime ? _savePassword : _verifyPassword,
-                  child: Text(_isFirstTime ? 'Şifre Oluştur' : 'Giriş Yap'),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _isFirstTime ? _savePassword : _verifyPassword,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF10B981),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: Text(
+                      _isFirstTime ? 'Şifre Oluştur' : 'Giriş Yap',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -433,183 +319,342 @@ class _DailyScreenState extends State<DailyScreen> {
     );
   }
 
-  // Günlük yazma ekranı
+  // Yeni Tasarım: Günlük Ana Ekranı
   Widget _buildDiaryScreen() {
-    final now = DateTime.now();
-    final dateFormat = DateFormat('dd MMMM yyyy, EEEE', 'tr');
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildDateHeader(dateFormat, now),
+          // Özel Başlık Alanı
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    'Günlüğüm',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF064E3B),
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Düşüncelerinizi özgürce yazın',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF6B7280),
+                    ),
+                  ),
+                ],
+              ),
+              InkWell(
+                onTap: _lockDiary,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.lock_outline, color: Color(0xFF064E3B)),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 24),
-          const Text(
-            'Ruh Halin',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1B4332),
+
+          // Yeni Kayıt Kartı
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: const [
+                    Icon(Icons.menu_book, color: Color(0xFF10B981)),
+                    SizedBox(width: 8),
+                    Text(
+                      'Yeni Kayıt',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF064E3B),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                
+                const Text(
+                  'Başlık',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF064E3B),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    hintText: 'Bugünün başlığı...',
+                    hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
+                    filled: true,
+                    fillColor: const Color(0xFFF9FAFB),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF10B981)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                const Text(
+                  'İçerik',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF064E3B),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _entryController,
+                  maxLines: 6,
+                  decoration: InputDecoration(
+                    hintText: 'Bugün neler oldu? Nasıl hissediyorsunuz?',
+                    hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
+                    filled: true,
+                    fillColor: const Color(0xFFF9FAFB),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF10B981)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    onPressed: _isLoading ? null : _saveDiary,
+                    icon: _isLoading 
+                        ? const SizedBox() 
+                        : const Icon(Icons.save_outlined, color: Colors.white, size: 20),
+                    label: _isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                        : const Text(
+                            'Kaydet',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF76D7C4), // Resimdeki buton rengine yakın bir mint/teal
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          _buildMoodSelector(),
-          const SizedBox(height: 20),
-          _buildEntryField(),
+          
+          const SizedBox(height: 30),
+          
+          const Text(
+            'Önceki Kayıtlar',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF064E3B),
+            ),
+          ),
           const SizedBox(height: 16),
-          _buildPrivacySwitch(),
-          const SizedBox(height: 24),
-          _buildSaveButton(),
+
+          // Önceki Kayıtlar Listesi
+          _buildHistoryList(),
         ],
       ),
     );
   }
 
-  Widget _buildDateHeader(DateFormat format, DateTime now) {
+  Widget _buildHistoryList() {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return const SizedBox();
+
+    return FutureBuilder<String?>(
+      future: _encryptionService.getDiaryPassword(),
+      builder: (context, passSnapshot) {
+        if (!passSnapshot.hasData) return const SizedBox();
+        final diaryPassword = passSnapshot.data!;
+
+        return StreamBuilder<QuerySnapshot>(
+          stream: _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('diaries')
+              .orderBy('date', descending: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)));
+            }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Henüz günlük kaydı bulunmuyor.',
+                    style: TextStyle(color: Color(0xFF6B7280)),
+                  ),
+                ),
+              );
+            }
+
+            return Column(
+              children: snapshot.data!.docs.map((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                final date = (data['date'] as Timestamp).toDate();
+                final encryptedContent = data['content'] ?? '';
+                final encryptedTitle = data['title'] ?? '';
+
+                String decryptedTitle = 'Başlık Çözülemedi';
+                String decryptedContent = 'İçerik Çözülemedi';
+
+                try {
+                  if (encryptedTitle.isNotEmpty) {
+                    decryptedTitle = _encryptionService.decryptText(encryptedTitle, diaryPassword);
+                  } else {
+                    decryptedTitle = 'İsimsiz Günlük';
+                  }
+                  decryptedContent = _encryptionService.decryptText(encryptedContent, diaryPassword);
+                } catch (e) {
+                  decryptedTitle = '🔒 Şifreli Başlık';
+                  decryptedContent = '🔒 Şifreli içerik';
+                }
+
+                return _buildHistoryCard(decryptedTitle, decryptedContent, date);
+              }).toList(),
+            );
+          },
+        );
+      }
+    );
+  }
+
+  Widget _buildHistoryCard(String title, String content, DateTime date) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF72B01D), Color(0xFF8BC34A)],
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            format.format(now),
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF10B981),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.calendar_today, color: Colors.white, size: 24),
           ),
-          const SizedBox(height: 4),
-          const Text(
-            'Bugün nasıl hissediyorsun?',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF064E3B),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(
+                      DateFormat('dd MMMM yyyy', 'tr').format(date),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF9CA3AF),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  content,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF4B5563),
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMoodSelector() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: _moods.map((mood) {
-          final isSelected = _selectedMood == mood;
-          return GestureDetector(
-            onTap: () => setState(() => _selectedMood = mood),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? const Color(0xFF72B01D).withValues(alpha: 0.1)
-                    : null,
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color:
-                      isSelected ? const Color(0xFF72B01D) : Colors.transparent,
-                ),
-              ),
-              child: Text(mood, style: const TextStyle(fontSize: 24)),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildEntryField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Günlük Girişin',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1B4332),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: TextField(
-            controller: _entryController,
-            maxLines: 8,
-            decoration: const InputDecoration(
-              hintText:
-                  'Bugün neler yaşadın? Duygularını, düşüncelerini paylaş...',
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.all(16),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPrivacySwitch() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          Icon(_isPrivate ? Icons.lock : Icons.lock_open,
-              color: const Color(0xFF72B01D)),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Text(
-              'Bu girişi özel yap (sadece ben görebilirim)',
-              style: TextStyle(color: Color(0xFF1B4332)),
-            ),
-          ),
-          Switch(
-            value: _isPrivate,
-            onChanged: (value) => setState(() => _isPrivate = value),
-            activeThumbColor: const Color(0xFF72B01D),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 55,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _saveDiary,
-        child: _isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : const Text(
-                'Günlüğü Kaydet',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
       ),
     );
   }
@@ -617,24 +662,11 @@ class _DailyScreenState extends State<DailyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
-      appBar: AppBar(
-        title: const Text(
-          'Günlük',
-          style: TextStyle(color: Color(0xFF1B4332)),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF72B01D)),
-        actions: [
-          if (!_isPasswordScreen)
-            IconButton(
-              icon: const Icon(Icons.history, color: Color(0xFF72B01D)),
-              onPressed: _showHistory,
-            ),
-        ],
+      backgroundColor: const Color(0xFFF0FDF4), // Hafif mint arkaplan
+      // AppBar'ı tamamen kaldırdık çünkü başlık kısmı gövdeye entegre edildi.
+      body: SafeArea(
+        child: _isPasswordScreen ? _buildPasswordScreen() : _buildDiaryScreen(),
       ),
-      body: _isPasswordScreen ? _buildPasswordScreen() : _buildDiaryScreen(),
     );
   }
 }

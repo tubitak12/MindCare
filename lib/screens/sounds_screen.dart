@@ -28,7 +28,7 @@ class SoundsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       body: SafeArea(
         child: GridView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
@@ -103,7 +103,7 @@ class SoundsScreen extends StatelessWidget {
                 width: 40,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: const Color(0xFFE5E7EB),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),

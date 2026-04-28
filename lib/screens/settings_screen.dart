@@ -21,12 +21,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final user = _authService.currentUser;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F7EE),
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
-        title: const Text('Ayarlar', style: TextStyle(color: Color(0xFF1B4332))),
+        title: const Text('Ayarlar', style: TextStyle(color: Color(0xFF064E3B))),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF72B01D)),
+        iconTheme: const IconThemeData(color: Color(0xFF10B981)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -93,9 +93,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Row(
         children: [
           const CircleAvatar(
-            backgroundColor: Color(0xFFF0F7EE),
+            backgroundColor: Color(0xFFF0FDF4),
             radius: 30,
-            child: Icon(Icons.person, color: Color(0xFF72B01D), size: 35),
+            child: Icon(Icons.person, color: Color(0xFF10B981), size: 35),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -109,13 +109,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 Text(
                   user?.email ?? 'email@example.com',
-                  style: const TextStyle(color: Colors.grey),
+                  style: const TextStyle(color: const Color(0xFF6B7280)),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.edit_note, color: Color(0xFF72B01D)),
+            icon: const Icon(Icons.edit_note, color: Color(0xFF10B981)),
             onPressed: _showEditProfileDialog,
           ),
         ],
@@ -172,7 +172,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SnackBar(
                                 content: Text(
                                     'Sıfırlama bağlantısı $email adresine gönderildi! 📧'),
-                                backgroundColor: const Color(0xFF72B01D),
+                                backgroundColor: const Color(0xFF10B981),
                                 behavior: SnackBarBehavior.floating,
                                 duration: const Duration(seconds: 4),
                               ),
@@ -231,12 +231,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Function(bool) onChanged,
   ) {
     return SwitchListTile(
-      secondary: Icon(icon, color: const Color(0xFF72B01D)),
+      secondary: Icon(icon, color: const Color(0xFF10B981)),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
       value: value,
       onChanged: onChanged,
-      activeThumbColor: const Color(0xFF72B01D),
+      activeThumbColor: const Color(0xFF10B981),
     );
   }
 
@@ -283,7 +283,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF72B01D),
+                color: Color(0xFF10B981),
               ),
             ),
           ),
@@ -303,28 +303,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ListTile(
       leading: Icon(
         icon,
-        color: isDestructive ? Colors.redAccent : const Color(0xFF72B01D),
+        color: isDestructive ? Colors.redAccent : const Color(0xFF10B981),
       ),
       title: Text(
         title,
         style: TextStyle(
-          color: isDestructive ? Colors.redAccent : const Color(0xFF1B4332),
+          color: isDestructive ? Colors.redAccent : const Color(0xFF064E3B),
         ),
       ),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
       trailing:
-          const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+          const Icon(Icons.arrow_forward_ios, size: 14, color: const Color(0xFF6B7280)),
       onTap: onTap,
     );
   }
 
   Widget _buildLanguageTile() {
     return ListTile(
-      leading: const Icon(Icons.language, color: Color(0xFF72B01D)),
+      leading: const Icon(Icons.language, color: Color(0xFF10B981)),
       title: const Text('Uygulama Dili'),
       subtitle: Text(_selectedLanguage, style: const TextStyle(fontSize: 12)),
       trailing:
-          const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+          const Icon(Icons.arrow_forward_ios, size: 14, color: const Color(0xFF6B7280)),
       onTap: () {},
     );
   }
