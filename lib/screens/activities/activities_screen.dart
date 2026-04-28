@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'breathing_exercise_screen.dart' as be;
 import 'box_breathing_screen.dart' as bb;
 import 'diaphragm_breathing_screen.dart' as db;
+import 'color_focus_game.dart'; // ✅ EKLENDİ
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
@@ -112,7 +113,7 @@ class ActivitiesScreen extends StatelessWidget {
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        color: const Color(0xFF6B7280),
+                        color: Color(0xFF6B7280),
                         fontSize: 12,
                       ),
                     ),
@@ -143,7 +144,7 @@ class ActivitiesScreen extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color(0xFFF0FDF4),
+          color: Color(0xFFF0FDF4),
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Icon(
@@ -161,12 +162,12 @@ class ActivitiesScreen extends StatelessWidget {
       ),
       subtitle: Text(
         description,
-        style: const TextStyle(fontSize: 12, color: const Color(0xFF6B7280)),
+        style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
       ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFFF0FDF4),
+          color: Color(0xFFF0FDF4),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -209,11 +210,20 @@ class ActivitiesScreen extends StatelessWidget {
             );
             break;
 
+          case '10 Dakika Farkındalık': // ✅ EKLENDİ
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ColorFocusGame(),
+              ),
+            );
+            break;
+
           default:
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('$title yakında eklenecek 🧘'),
-                backgroundColor: const Color(0xFF10B981),
+                backgroundColor: Color(0xFF10B981),
               ),
             );
         }

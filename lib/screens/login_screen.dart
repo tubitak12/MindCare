@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/auth_service.dart';
 import 'mood_selection_screen.dart';
@@ -36,7 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (user != null) {
-        final prefs = await SharedPreferences.getInstance();
         if (!mounted) return;
 
         final String today = DateTime.now().toIso8601String().split('T')[0];

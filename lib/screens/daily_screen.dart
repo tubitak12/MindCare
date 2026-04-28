@@ -24,7 +24,7 @@ class _DailyScreenState extends State<DailyScreen> {
 
   // Tasarımda emoji yok, ancak veritabanı yapısını bozmamak için varsayılan bir değer atıyoruz
   final String _selectedMood = '😐'; 
-  bool _isPrivate = true; // Tasarımda switch yok, her şeyi private sayalım
+  final bool _isPrivate = true; // Tasarımda switch yok, her şeyi private sayalım
   bool _isFirstTime = false; // İlk kez mi giriliyor?
   bool _isPasswordScreen = true; // Şifre ekranında mı?
   bool _isLoading = false;

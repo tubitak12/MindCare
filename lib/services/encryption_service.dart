@@ -1,21 +1,8 @@
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class EncryptionService {
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  SharedPreferences? _prefs;
-
-  // SharedPreferences'i başlat
-  Future<void> _initPrefs() async {
-    if (kIsWeb) {
-      _prefs ??= await SharedPreferences.getInstance();
-    }
-  }
-
   // Günlük şifresini Firebase'e kaydet
   Future<void> saveDiaryPassword(String password) async {
     final user = FirebaseAuth.instance.currentUser;
