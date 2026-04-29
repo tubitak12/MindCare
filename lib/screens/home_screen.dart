@@ -30,6 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isCookieBroken = false;
   String _cookieMessage = "Kurabiyeyi kır ve günün mesajını al!";
 
+  bool _isPlayerVisible = false;        
+  String? _lastPlayedTitle;      
+  String? _lastPlayedUrl;
+
   List<String> _motivationalMessages = [];
   bool _isLoadingMessages = true;
 
@@ -125,25 +129,30 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _getPage() {
-    switch (_selectedIndex) {
-      case 0:
-        return _buildHomeContent();
-      case 1:
-        return SoundsScreen(
-          onSoundTap: (url, title) async {
-            if (_playingTitle == title) {
-              await _audioPlayer.stop();
-              setState(() => _playingTitle = null);
-            } else {
-              await _audioPlayer.stop();
-              await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-              await _audioPlayer.play(UrlSource(url));
-              setState(() => _playingTitle = title);
-            }
-          },
-          playingTitle: _playingTitle,
-        );
+ Widget _getPage() {
+  switch (_selectedIndex) {
+    case 1:
+      return SoundsScreen(
+        onSoundTap: (url, title) async {
+          if (_playingTitle == title) {
+            await _audioPlayer.stop();
+            setState(() {
+              _playingTitle = null; // Müzik durdu ama isim gitmeyecek
+            });
+          } else {
+            await _audioPlayer.stop();
+            await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+            await _audioPlayer.play(AssetSource('sounds/$url'));
+            setState(() {
+              _playingTitle = title;
+              _lastPlayedTitle = title; // İsim hafızaya alındı
+              _lastPlayedUrl = url;     // URL hafızaya alındı
+              _isPlayerVisible = true;  // Bar açıldı
+            });
+          }
+        },
+        playingTitle: _playingTitle,
+      );
       case 2:
         return const ActivitiesScreen();
       case 3:
@@ -393,13 +402,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _audioPlayer.dispose();
     super.dispose();
   }
-
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0FDF4),
-
-      // ✅ SADECE BU DEĞİŞTİ
       appBar: AppBar(
         backgroundColor: const Color(0xFF10B981),
         elevation: 0,
@@ -412,9 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-
       body: SafeArea(child: _getPage()),
-
       floatingActionButton: Container(
         width: 60,
         height: 60,
@@ -450,7 +454,72 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Text('🧠', style: TextStyle(fontSize: 28)),
         ),
       ),
-
+      
+      bottomSheet: !_isPlayerVisible 
+    ? null 
+    : Container(
+        height: 90,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1B4332), 
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, -5)),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(color: Colors.white10, shape: BoxShape.circle),
+              child: const Icon(Icons.music_note, color: Color(0xFF72B01D), size: 28),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _playingTitle ?? _lastPlayedTitle ?? "Ses Seçilmedi", // İsim burada çakılı kalır
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Text("Zihnini özgür bırak...", style: TextStyle(color: Colors.white60, fontSize: 11)),
+                ],
+              ),
+            ),
+            // Oynat / Durdur Butonu
+            IconButton(
+              icon: Icon(
+                _playingTitle == null ? Icons.play_circle_filled : Icons.pause_circle_filled,
+                color: Colors.white, size: 42
+              ),
+              onPressed: () async {
+                if (_playingTitle != null) {
+                  await _audioPlayer.stop();
+                  setState(() => _playingTitle = null);
+                } else if (_lastPlayedUrl != null) {
+                  // Hafızadaki sesi tekrar başlatır
+                  await _audioPlayer.play(AssetSource('sounds/$_lastPlayedUrl'));
+                  setState(() => _playingTitle = _lastPlayedTitle);
+                }
+              },
+            ),
+            // Kapatma (X) Butonu
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+              onPressed: () async {
+                await _audioPlayer.stop();
+                setState(() {
+                  _playingTitle = null;
+                  _isPlayerVisible = false;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
