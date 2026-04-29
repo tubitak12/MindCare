@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'breathing_exercise_screen.dart' as be;
 import 'box_breathing_screen.dart' as bb;
 import 'diaphragm_breathing_screen.dart' as db;
-import 'color_focus_game.dart'; // ✅ EKLENDİ
+import 'color_focus_game.dart';
+import 'deep_body_scan_screen.dart';
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
@@ -33,7 +34,7 @@ class ActivitiesScreen extends StatelessWidget {
                 },
                 {
                   'title': 'Vücut Taraması',
-                  'duration': '15 dk',
+                  'duration': '10 dk',
                   'description': 'Vücut farkındalığı'
                 },
               ],
@@ -215,6 +216,15 @@ class ActivitiesScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => const ColorFocusGame(),
+              ),
+            );
+            break;
+
+          case 'Vücut Taraması':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DeepBodyScanScreen(totalDuration: 300),
               ),
             );
             break;

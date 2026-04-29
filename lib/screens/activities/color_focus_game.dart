@@ -10,7 +10,8 @@ class ColorFocusGame extends StatefulWidget {
 }
 
 class _ColorFocusGameState extends State<ColorFocusGame> {
-  final int gridSize = 4;
+  final int baseGridSize = 4;
+  int gridSize = 4;
 
   int score = 100;
   int level = 1;
@@ -40,6 +41,10 @@ class _ColorFocusGameState extends State<ColorFocusGame> {
   }
 
   void startGame() {
+    // Her 8 seviyeden sonra grid boyutu artar (max 6x6)
+    gridSize = baseGridSize + (level ~/ 8);
+    if (gridSize > 6) gridSize = 6;
+
     int total = gridSize * gridSize;
     targetIndex = random.nextInt(total);
 
@@ -52,7 +57,9 @@ class _ColorFocusGameState extends State<ColorFocusGame> {
   }
 
   Color getSlightlyDifferentColor(Color base) {
-    int diff = max(8, 50 - (level ~/ 2));
+    // Seviye arttıkça fark küçülüyor ama yavaş ve kademeli
+    // 50'den başlayıp her 3 seviyede 1 azalıyor, minimum 8
+    int diff = max(8, 50 - (level ~/ 3));
 
     int r = (base.red + random.nextInt(diff) - diff ~/ 2).clamp(0, 255);
     int g = (base.green + random.nextInt(diff) - diff ~/ 2).clamp(0, 255);
@@ -90,45 +97,96 @@ class _ColorFocusGameState extends State<ColorFocusGame> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
+        backgroundColor: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
                 Icons.emoji_events_outlined,
-                size: 60,
-                color: Colors.orange,
+                size: 65,
+                color: Color(0xFF10B981),
               ),
-              const SizedBox(height: 10),
-
+              const SizedBox(height: 16),
               const Text(
                 "Oyun Bitti",
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF064E3B),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Skorun: $score",
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: Color(0xFF10B981),
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
-              const SizedBox(height: 10),
-
+              const SizedBox(height: 8),
               Text(
-                "Skorun: $score",
-                style: const TextStyle(fontSize: 18),
+                "Seviye: $level",
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
               ),
-
-              const SizedBox(height: 20),
-
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    score = 100;
-                    level = 1;
-                    startGame();
-                  });
-                },
-                child: const Text("Yeniden Başla"),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF10B981),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          score = 100;
+                          level = 1;
+                          startGame();
+                        });
+                      },
+                      child: const Text(
+                        "Yeniden Başla",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                          color: Color(0xFF10B981),
+                          width: 2,
+                        ),
+                        foregroundColor: const Color(0xFF10B981),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Çık",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -142,31 +200,37 @@ class _ColorFocusGameState extends State<ColorFocusGame> {
     int total = gridSize * gridSize;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
         title: const Text("Farklı Rengi Bul"),
+        backgroundColor: const Color(0xFF10B981),
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
 
           Text(
             "⭐ Skor: $score | Level: $level",
-            style: const TextStyle(fontSize: 18),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF064E3B),
+            ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
 
-          // 🔥 GRID'E NEFES ALDIRDIK
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16.0), // 👈 kenarlardan boşluk
+              padding: const EdgeInsets.all(16.0),
               child: GridView.builder(
                 itemCount: total,
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 6,
-                  mainAxisSpacing: 6,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: gridSize,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
                 ),
                 itemBuilder: (context, index) {
                   return GestureDetector(
@@ -176,7 +240,14 @@ class _ColorFocusGameState extends State<ColorFocusGame> {
                         color: index == targetIndex
                             ? differentColor
                             : baseColor,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          )
+                        ],
                       ),
                     ),
                   );
