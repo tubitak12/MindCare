@@ -127,12 +127,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
             'Harika bir ruh halindesiniz! Anksiyete belirtileriniz minimal düzeyde.',
         description:
             'Endişelerinizle başa çıkma konusunda iyi bir durumdasınız.',
-        suggestions: [
+        suggestions: const [
           '✨ Günlük tutmaya devam edin',
           '🧘 Haftada 2-3 kez meditasyon yapın',
           '🚶 Düzenli yürüyüşler yapın',
         ],
-        activities: ['Meditasyon', 'Yürüyüş', 'Günlük'],
+        activities: const ['Meditasyon', 'Yürüyüş', 'Günlük'],
         quote: 'Kendinle barışık olmak, dünyayla barışık olmanın ilk adımıdır.',
         color: const Color(0xFF10B981),
       );
@@ -142,12 +142,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '🌿',
         mainMessage: 'Hafif düzeyde anksiyete belirtileriniz var.',
         description: 'Zaman zaman endişelenmek insan doğasının bir parçasıdır.',
-        suggestions: [
+        suggestions: const [
           '🌬️ 4-7-8 nefes egzersizini deneyin',
           '💤 Uyku düzeninize dikkat edin',
           '🍵 Kafein tüketimini azaltın',
         ],
-        activities: ['4-7-8 Nefes', 'Kutu Nefesi', 'Doğa Sesleri'],
+        activities: const ['4-7-8 Nefes', 'Kutu Nefesi', 'Doğa Sesleri'],
         quote: 'Endişe, bugünün gücünü yarının gölgesinde harcamaktır.',
         color: const Color(0xFF8BC34A),
       );
@@ -157,12 +157,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '💚',
         mainMessage: 'Orta düzeyde anksiyete belirtileriniz var.',
         description: 'Bu dönemde kendinize nazik olun.',
-        suggestions: [
+        suggestions: const [
           '🧘‍♀️ Günlük 10 dakika meditasyon yapın',
           '📞 Güvendiğiniz biriyle konuşun',
           '🏃 Düzenli egzersiz yapın',
         ],
-        activities: ['Meditasyon', 'Nefes Egzersizleri', 'Günlük'],
+        activities: const ['Meditasyon', 'Nefes Egzersizleri', 'Günlük'],
         quote: 'En karanlık gece bile sona erecek ve güneş doğacak.',
         color: const Color(0xFFFFA726),
       );
@@ -173,12 +173,16 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         mainMessage: 'Yüksek düzeyde anksiyete belirtileriniz var.',
         description:
             'Yalnız değilsiniz. Profesyonel destek almak önemli bir adımdır.',
-        suggestions: [
+        suggestions: const [
           '📞 Psikolojik Destek Hattı: 183',
           '👨‍⚕️ Bir uzmandan randevu alın',
           '🧘‍♀️ Günlük rahatlama egzersizleri yapın',
         ],
-        activities: ['Derin Nefes', 'Profesyonel Destek', 'Rutin Oluşturma'],
+        activities: const [
+          'Derin Nefes',
+          'Profesyonel Destek',
+          'Rutin Oluşturma'
+        ],
         quote: 'Yardım istemek, güçlü olmanın en cesur yoludur.',
         color: const Color(0xFFEF5350),
       );
@@ -192,12 +196,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '🌈',
         mainMessage: 'Depresyon belirtileriniz minimal düzeyde.',
         description: 'Pozitif enerjinizi korumak için yapabilecekleriniz var.',
-        suggestions: [
+        suggestions: const [
           '✨ Her gün minnettar olduğunuz 3 şeyi yazın',
           '🌟 Sevdiğiniz insanlarla vakit geçirin',
           '🎨 Yeni bir hobi edinin',
         ],
-        activities: ['Günlük', 'Meditasyon', 'Sesli Kitap'],
+        activities: const ['Günlük', 'Meditasyon', 'Sesli Kitap'],
         quote: 'Mutluluk bir yolculuktur, varış noktası değil.',
         color: const Color(0xFF10B981),
       );
@@ -207,12 +211,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '🌻',
         mainMessage: 'Hafif düzeyde depresyon belirtileriniz var.',
         description: 'Duygularınızı kabul edin ve kendinize şefkat gösterin.',
-        suggestions: [
+        suggestions: const [
           '☀️ Her sabah güneş ışığında 15 dk yürüyüş',
           '📖 İlham verici kitaplar okuyun',
           '🎵 Neşeli müzikler dinleyin',
         ],
-        activities: ['Yürüyüş', 'Motivasyon Sesleri', 'Günlük'],
+        activities: const ['Yürüyüş', 'Motivasyon Sesleri', 'Günlük'],
         quote: 'Küçük adımlar, büyük değişimlerin başlangıcıdır.',
         color: const Color(0xFF8BC34A),
       );
@@ -222,12 +226,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '💚',
         mainMessage: 'Orta düzeyde depresyon belirtileriniz var.',
         description: 'Bu süreçte yalnız olmadığınızı unutmayın.',
-        suggestions: [
+        suggestions: const [
           '📞 Güvendiğiniz biriyle konuşun',
           '🧘‍♀️ Düzenli meditasyon yapın',
           '🍽️ Düzenli ve sağlıklı beslenin',
         ],
-        activities: ['Meditasyon', 'Nefes Egzersizleri', 'Günlük'],
+        activities: const ['Meditasyon', 'Nefes Egzersizleri', 'Günlük'],
         quote:
             'Karanlık ne kadar derin olursa olsun, ışık her zaman geri döner.',
         color: const Color(0xFFFFA726),
@@ -238,12 +242,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '🤗',
         mainMessage: 'Orta-şiddetli düzeyde depresyon belirtileriniz var.',
         description: 'İyileşmek mümkün. Lütfen kendinize zaman tanıyın.',
-        suggestions: [
+        suggestions: const [
           '👨‍⚕️ Bir uzmandan randevu alın',
           '📞 Psikolojik Destek Hattı: 183',
           '👥 Destek gruplarına katılın',
         ],
-        activities: ['Profesyonel Destek', 'Meditasyon', 'Nefes'],
+        activities: const ['Profesyonel Destek', 'Meditasyon', 'Nefes'],
         quote: 'Yardım istemek, iyileşmenin en cesur adımıdır.',
         color: const Color(0xFFEF5350),
       );
@@ -254,12 +258,16 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         mainMessage: 'Şiddetli düzeyde depresyon belirtileriniz var.',
         description:
             'Yalnız değilsiniz. Profesyonel yardım almak hayat kurtarabilir.',
-        suggestions: [
+        suggestions: const [
           '🚨 ACİL DURUM: 112',
           '📞 Psikolojik Destek Hattı: 183',
           '🏥 En yakın hastanenin psikiyatri servisine başvurun',
         ],
-        activities: ['Acil Destek', 'Profesyonel Yardım', 'Kriz Yönetimi'],
+        activities: const [
+          'Acil Destek',
+          'Profesyonel Yardım',
+          'Kriz Yönetimi'
+        ],
         quote: 'Hayat değerlidir, yardım eli her zaman uzanır.',
         color: const Color(0xFFD32F2F),
       );
@@ -273,12 +281,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '😌',
         mainMessage: 'Stres seviyeniz düşük! Bu harika bir durum.',
         description: 'Stres yönetiminde başarılısınız.',
-        suggestions: [
+        suggestions: const [
           '✨ Mevcut rutininizi koruyun',
           '🧘 Haftada 1-2 kez meditasyon yapın',
           '📚 Yeni şeyler öğrenmeye devam edin',
         ],
-        activities: ['Meditasyon', 'Yürüyüş', 'Kitap Okuma'],
+        activities: const ['Meditasyon', 'Yürüyüş', 'Kitap Okuma'],
         quote: 'Denge, hayatın en güzel halidir.',
         color: const Color(0xFF10B981),
       );
@@ -288,12 +296,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '🌊',
         mainMessage: 'Orta düzeyde stres altındasınız.',
         description: 'Stres hayatın doğal bir parçasıdır.',
-        suggestions: [
+        suggestions: const [
           '🌬️ Nefes egzersizlerini günlük rutininize ekleyin',
           '🏃 Haftada 3-4 kez egzersiz yapın',
           '💤 Uyku düzeninize dikkat edin',
         ],
-        activities: ['Kutu Nefesi', 'Doğa Sesleri', 'Yürüyüş'],
+        activities: const ['Kutu Nefesi', 'Doğa Sesleri', 'Yürüyüş'],
         quote: 'Stres, hayatın tadını çıkarmayı unuttuğumuzda ortaya çıkar.',
         color: const Color(0xFFFFA726),
       );
@@ -303,12 +311,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '💪',
         mainMessage: 'Yüksek düzeyde stres altındasınız.',
         description: 'Sürekli yüksek stres sağlığınızı etkileyebilir.',
-        suggestions: [
+        suggestions: const [
           '🧘‍♀️ Günlük 15 dakika meditasyon',
           '🚶 Doğada vakit geçirin',
           '👨‍⚕️ Stres yönetimi eğitimi alın',
         ],
-        activities: ['Meditasyon', 'Nefes Egzersizleri', 'Doğa Yürüyüşü'],
+        activities: const ['Meditasyon', 'Nefes Egzersizleri', 'Doğa Yürüyüşü'],
         quote: 'Mola vermek, pes etmek değildir.',
         color: const Color(0xFFEF5350),
       );
@@ -324,12 +332,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '🌟',
         mainMessage: 'İyi olma haliniz yüksek seviyede!',
         description: 'Hayatınızda dengeyi yakalamışsınız.',
-        suggestions: [
+        suggestions: const [
           '✨ Deneyimlerinizi başkalarıyla paylaşın',
           '🤝 İhtiyacı olanlara destek olun',
           '🎯 Yeni hedefler belirleyin',
         ],
-        activities: ['Meditasyon', 'Günlük', 'Motivasyon'],
+        activities: const ['Meditasyon', 'Günlük', 'Motivasyon'],
         quote: 'İyilik, paylaştıkça çoğalır.',
         color: const Color(0xFF10B981),
       );
@@ -340,12 +348,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         mainMessage: 'Orta düzeyde iyi olma halindesiniz.',
         description:
             'Kendinizi daha iyi hissetmek için yapabilecekleriniz var.',
-        suggestions: [
+        suggestions: const [
           '🧘 Günlük meditasyon pratiği ekleyin',
           '📖 Kişisel gelişim kitapları okuyun',
           '🎨 Yeni bir hobi edinin',
         ],
-        activities: ['Meditasyon', 'Yürüyüş', 'Kitap Okuma'],
+        activities: const ['Meditasyon', 'Yürüyüş', 'Kitap Okuma'],
         quote: 'Küçük adımlar, büyük değişimler yaratır.',
         color: const Color(0xFF8BC34A),
       );
@@ -355,12 +363,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
         emoji: '🤗',
         mainMessage: 'İyi olma haliniz düşük seviyede.',
         description: 'Herkes zor dönemler geçirebilir.',
-        suggestions: [
+        suggestions: const [
           '🧘‍♀️ Günlük rahatlama egzersizleri',
           '📞 Sevdiğiniz biriyle konuşun',
           '🚶 Doğada vakit geçirin',
         ],
-        activities: ['Meditasyon', 'Nefes', 'Günlük'],
+        activities: const ['Meditasyon', 'Nefes', 'Günlük'],
         quote: 'En karanlık an, şafağın habercisidir.',
         color: const Color(0xFFFFA726),
       );
@@ -370,20 +378,17 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
   ResultData _getDefaultResult() {
     final percentage = (widget.score / widget.maxScore) * 100;
     return ResultData(
-      level: percentage >= 70
-          ? 'Yüksek'
-          : percentage >= 50
-              ? 'Orta'
-              : 'Düşük',
+      level:
+          percentage >= 70 ? 'Yüksek' : (percentage >= 50 ? 'Orta' : 'Düşük'),
       emoji: '📊',
       mainMessage: 'Testinizi tamamladınız.',
       description: 'Sonuçlarınız değerlendirildi.',
-      suggestions: [
+      suggestions: const [
         '🧘 Düzenli meditasyon yapın',
         '📝 Günlük tutun',
         '🚶 Doğada yürüyüş yapın',
       ],
-      activities: ['Meditasyon', 'Günlük', 'Yürüyüş'],
+      activities: const ['Meditasyon', 'Günlük', 'Yürüyüş'],
       quote: 'Kendini tanımak, iyileşmenin ilk adımıdır.',
       color: const Color(0xFF10B981),
     );
@@ -477,7 +482,6 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Seviye Göstergesi
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -485,18 +489,16 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          result.color.withValues(alpha: 0.2),
-                          result.color.withValues(alpha: 0.05),
+                          result.color.withOpacity(0.2),
+                          result.color.withOpacity(0.05),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Column(
                       children: [
-                        Text(
-                          result.emoji,
-                          style: const TextStyle(fontSize: 60),
-                        ),
+                        Text(result.emoji,
+                            style: const TextStyle(fontSize: 60)),
                         const SizedBox(height: 16),
                         Text(
                           result.level,
@@ -522,13 +524,12 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                               ' / ${widget.maxScore}',
                               style: const TextStyle(
                                 fontSize: 24,
-                                color: const Color(0xFF6B7280),
+                                color: Color(0xFF6B7280),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        // DÜZELTİLDİ: height yerine SizedBox kullanıldı
                         SizedBox(
                           height: 8,
                           child: LinearProgressIndicator(
@@ -541,15 +542,14 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
-                  // Ana Mesaj
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: const Color(0xFFD1FAE5), width: 1.2),
                     ),
                     child: Column(
                       children: [
@@ -566,9 +566,9 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                         const SizedBox(height: 12),
                         Text(
                           result.description,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
-                            color: const Color(0xFF6B7280),
+                            color: Color(0xFF6B7280),
                             height: 1.4,
                           ),
                           textAlign: TextAlign.center,
@@ -576,15 +576,14 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
-                  // Öneriler
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: const Color(0xFFD1FAE5), width: 1.2),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -633,15 +632,14 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
-                  // Önerilen Aktiviteler
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: const Color(0xFFD1FAE5), width: 1.2),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -673,10 +671,10 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                                   vertical: 10,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: result.color.withValues(alpha: 0.1),
+                                  color: result.color.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: result.color.withValues(alpha: 0.3),
+                                    color: result.color.withOpacity(0.3),
                                   ),
                                 ),
                                 child: Row(
@@ -705,10 +703,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
-                  // İlham Veren Söz
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -716,15 +711,16 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          result.color.withValues(alpha: 0.1),
-                          result.color.withValues(alpha: 0.05),
+                          result.color.withOpacity(0.1),
+                          result.color.withOpacity(0.05),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
                       children: [
-                        const Icon(Icons.format_quote, color: const Color(0xFF6B7280)),
+                        const Icon(Icons.format_quote,
+                            color: Color(0xFF6B7280)),
                         const SizedBox(height: 8),
                         Text(
                           result.quote,
@@ -739,10 +735,7 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
-                  // Butonlar
                   Row(
                     children: [
                       Expanded(
@@ -782,7 +775,6 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
                 ],
               ),
@@ -791,7 +783,6 @@ class _TestsResultScreenState extends State<TestsResultScreen> {
   }
 }
 
-// Sonuç verilerini tutan sınıf
 class ResultData {
   final String level;
   final String emoji;
@@ -802,7 +793,7 @@ class ResultData {
   final String quote;
   final Color color;
 
-  ResultData({
+  const ResultData({
     required this.level,
     required this.emoji,
     required this.mainMessage,

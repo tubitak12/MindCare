@@ -1,51 +1,46 @@
-﻿import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'tests_detail_screen.dart';
 
-class TestsScreen extends StatefulWidget {
+class TestsScreen extends StatelessWidget {
   final String categoryId;
   final String categoryName;
   final Color categoryColor;
-  final String categoryColorHex;
+  final String? categoryIcon;
 
   const TestsScreen({
     super.key,
     required this.categoryId,
     required this.categoryName,
     required this.categoryColor,
-    required this.categoryColorHex,
+    this.categoryIcon,
   });
-
-  @override
-  State<TestsScreen> createState() => _TestsScreenState();
-}
-
-class _TestsScreenState extends State<TestsScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
-        title: Text(
-          widget.categoryName,
-          style: const TextStyle(
-            color: Color(0xFF064E3B),
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          children: [
+            Icon(_parseIcon(categoryIcon ?? 'spa'),
+                size: 24, color: Colors.white),
+            const SizedBox(width: 10),
+            Text(categoryName, style: const TextStyle(color: Colors.white)),
+          ],
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: categoryColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: widget.categoryColor),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore
+        stream: FirebaseFirestore.instance
             .collection('tests')
-            .where('categoryId', isEqualTo: widget.categoryId)
+            .where('categoryId', isEqualTo: categoryId)
+            .orderBy('order')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -53,74 +48,155 @@ class _TestsScreenState extends State<TestsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 50, color: Colors.red),
-                  const SizedBox(height: 10),
-                  Text('Hata: ${snapshot.error}'),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => setState(() {}),
-                    child: const Text('Tekrar Dene'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF10B981)),
-            );
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.assignment_late,
-                    size: 60,
-                    color: widget.categoryColor.withValues(alpha: 0.5),
-                  ),
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text(
-                    'Bu kategoride henüz test yok',
-                    style: TextStyle(
-                      color: const Color(0xFF6B7280),
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Yakında eklenecek',
-                    style: TextStyle(
-                      color: const Color(0xFF6B7280),
-                      fontSize: 14,
-                    ),
-                  ),
+                  Text('Hata: ${snapshot.error}'),
                 ],
               ),
             );
+          }
+
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
           }
 
           final tests = snapshot.data!.docs;
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: tests.length,
-            itemBuilder: (context, index) {
-              final doc = tests[index];
-              final data = doc.data() as Map<String, dynamic>;
+          if (tests.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.assignment_turned_in,
+                      size: 48, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('Bu kategoride henüz test yok.'),
+                ],
+              ),
+            );
+          }
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: _buildTestCard(
-                  title: data['title'] ?? 'Test',
-                  description:
-                      data['subtitle'] ?? data['description'] ?? 'Açıklama',
-                  icon: data['icon'] ?? '📝',
-                  questionCount: data['questionCount'] ?? 0,
-                  testId: doc.id,
+          return ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: tests.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final test = tests[index];
+              final data = test.data() as Map<String, dynamic>;
+
+              final String testId = test.id;
+              final String title = data['title'] ?? 'Test';
+              final String subtitle = data['subtitle'] ?? '';
+              final int questionCount = data['questionCount'] ?? 0;
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF10B981),
+                    width: 1.2,
+                  ),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TestsDetailScreen(
+                          testId: testId,
+                          testTitle: title,
+                          themeColor: categoryColor,
+                          categoryId: categoryId, // ✅ EKLENDİ
+                        ),
+                      ),
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 20,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: categoryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(
+                              Icons.assignment,
+                              color: categoryColor,
+                              size: 32,
+                            ),
+                          ),
+                          const SizedBox(width: 18),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                if (subtitle.isNotEmpty) ...[
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    subtitle,
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                                const SizedBox(height: 10),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF10B981)
+                                        .withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.help_outline,
+                                        size: 14,
+                                        color: Color(0xFF10B981),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        '$questionCount Soru',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF10B981),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Colors.grey[400],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               );
             },
@@ -130,97 +206,22 @@ class _TestsScreenState extends State<TestsScreen> {
     );
   }
 
-  Widget _buildTestCard({
-    required String title,
-    required String description,
-    required String icon,
-    required int questionCount,
-    required String testId,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TestsDetailScreen(
-              testId: testId,
-              testTitle: title,
-              testColor: widget.categoryColor,
-              testColorHex: widget.categoryColorHex,
-              categoryId: widget.categoryId, // categoryId gönderiliyor
-            ),
-          ),
-        );
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(16),
-          leading: Container(
-            width: 55,
-            height: 55,
-            decoration: BoxDecoration(
-              color: widget.categoryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Center(
-              child: Text(
-                icon,
-                style: const TextStyle(fontSize: 28),
-              ),
-            ),
-          ),
-          title: Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Color(0xFF064E3B),
-            ),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: const TextStyle(color: const Color(0xFF6B7280), fontSize: 13),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '$questionCount soru',
-                style: TextStyle(color: const Color(0xFF6B7280), fontSize: 12),
-              ),
-            ],
-          ),
-          trailing: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: widget.categoryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.arrow_forward_ios,
-              color: widget.categoryColor,
-              size: 16,
-            ),
-          ),
-        ),
-      ),
-    );
+  IconData _parseIcon(String iconName) {
+    switch (iconName.toLowerCase()) {
+      case 'psychology':
+        return Icons.psychology;
+      case 'cloud':
+        return Icons.cloud;
+      case 'people':
+        return Icons.people;
+      case 'self_improvement':
+        return Icons.self_improvement;
+      case 'bedtime':
+        return Icons.bedtime;
+      case 'spa':
+        return Icons.spa;
+      default:
+        return Icons.spa;
+    }
   }
 }

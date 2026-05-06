@@ -1,310 +1,193 @@
-﻿import 'package:flutter/foundation.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tests_screen.dart';
 
-class TestsCategoryScreen extends StatefulWidget {
+class TestsCategoryScreen extends StatelessWidget {
   const TestsCategoryScreen({super.key});
-
-  @override
-  State<TestsCategoryScreen> createState() => _TestsCategoryScreenState();
-}
-
-class _TestsCategoryScreenState extends State<TestsCategoryScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> _categories = [];
-  bool _isLoading = true;
-  String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCategories();
-  }
-
-  Future<void> _loadCategories() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final snapshot = await _firestore.collection('categories').get();
-
-      if (kDebugMode) {
-        debugPrint('Kategori sayısı: ${snapshot.docs.length}');
-      }
-
-      if (snapshot.docs.isEmpty) {
-        setState(() {
-          _errorMessage =
-              'Henüz kategori eklenmemiş. Firebase konsolundan kategori ekleyin.';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final categories = snapshot.docs.map((doc) {
-        final data = doc.data();
-        return {
-          'id': doc.id,
-          'name': data['name'] ?? 'Kategori',
-          'description': data['description'] ?? '',
-          'icon': data['icon'] ?? 'Icons.psychology',
-          'color': data['color'] ?? '0xFF72B01D',
-          'order': data['order'] ?? 0,
-        };
-      }).toList();
-
-      categories
-          .sort((a, b) => (a['order'] as int).compareTo(b['order'] as int));
-
-      setState(() {
-        _categories = categories;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('HATA: $e');
-      }
-      setState(() {
-        _errorMessage =
-            'Bağlantı hatası: $e\n\nFirebase kurallarını kontrol edin.';
-        _isLoading = false;
-      });
-    }
-  }
-
-  IconData _getIconData(String iconName) {
-    switch (iconName) {
-      case 'Icons.psychology':
-        return Icons.psychology;
-      case 'Icons.cloud':
-        return Icons.cloud;
-      case 'Icons.flash_on':
-        return Icons.flash_on;
-      case 'Icons.star':
-        return Icons.star;
-      case 'Icons.favorite':
-        return Icons.favorite;
-      case 'Icons.bedtime':
-        return Icons.bedtime;
-      default:
-        return Icons.assignment;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0FDF4),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ruh Halini Değerlendir',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF064E3B),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Kendini daha iyi tanımak için bir kategori seç',
-                    style: TextStyle(
-                      color: const Color(0xFF6B7280),
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _buildBody(),
-            ),
-          ],
-        ),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(0),
+        child: SizedBox(),
       ),
-    );
-  }
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('categories')
+            .orderBy('order')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: Color(0xFF10B981)),
-            SizedBox(height: 16),
-            Text('Kategoriler yükleniyor...'),
-          ],
-        ),
-      );
-    }
+          final categories = snapshot.data!.docs;
 
-    if (_errorMessage != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 60, color: Colors.red),
-              const SizedBox(height: 20),
-              Text(
-                _errorMessage!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.red),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _loadCategories,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF10B981),
-                ),
-                child: const Text('Tekrar Dene'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+          return ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: categories.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final category = categories[index];
+              final data = category.data() as Map<String, dynamic>;
 
-    if (_categories.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.category, size: 60, color: const Color(0xFF6B7280)),
-            SizedBox(height: 16),
-            Text('Henüz kategori eklenmemiş'),
-            SizedBox(height: 8),
-            Text('Firebase konsolundan kategori ekleyin'),
-          ],
-        ),
-      );
-    }
+              final String id = category.id;
+              final String name = data['name'] ?? 'Kategori';
+              final String description = data['description'] ?? '';
+              final String iconName = data['icon'] ?? 'spa';
+              final Color color = Color(int.parse(
+                  data['color']?.toString().replaceAll('0x', '0xFF') ??
+                      '0xFF10B981'));
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: _categories.length,
-        itemBuilder: (context, index) {
-          final category = _categories[index];
-          final Color categoryColor = Color(
-            int.parse(category['color']),
-          );
-          final IconData icon = _getIconData(category['icon']);
+              return FutureBuilder<QuerySnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection('tests')
+                    .where('categoryId', isEqualTo: id)
+                    .get(),
+                builder: (context, testSnap) {
+                  final testCount =
+                      testSnap.hasData ? testSnap.data!.docs.length : 0;
 
-          return _buildCategoryCard(
-            icon: icon,
-            name: category['name'],
-            description: category['description'],
-            color: categoryColor,
-            categoryId: category['id'],
-            categoryName: category['name'],
-            categoryColorHex: category['color'],
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFF10B981),
+                        width: 1.2, // 🔹 İNCE KENARLIK (eskiden 2 idi)
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TestsScreen(
+                              categoryId: id,
+                              categoryName: name,
+                              categoryColor: color,
+                              categoryIcon: iconName,
+                            ),
+                          ),
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical:
+                                24, // 🔹 YÜKSEKLİK ARTIRILDI (eskiden 16 idi)
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(
+                                    14), // 🔹 İKON PADDING BÜYÜDÜ
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: Icon(
+                                  _getIcon(iconName),
+                                  color: color,
+                                  size:
+                                      44, // 🔹 İKON BOYUTU BÜYÜDÜ (eskiden 32 idi)
+                                ),
+                              ),
+                              const SizedBox(width: 18),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                    if (description.isNotEmpty) ...[
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        description,
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 10),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10B981)
+                                            .withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.assignment_outlined,
+                                            size: 14,
+                                            color: Color(0xFF10B981),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            '$testCount Test',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF10B981),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 18,
+                                color: Colors.grey[400],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
           );
         },
       ),
     );
   }
 
-  Widget _buildCategoryCard({
-    required IconData icon,
-    required String name,
-    required String description,
-    required Color color,
-    required String categoryId,
-    required String categoryName,
-    required String categoryColorHex,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TestsScreen(
-              categoryId: categoryId,
-              categoryName: categoryName,
-              categoryColor: color,
-              categoryColorHex: categoryColorHex,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: color.withValues(alpha: 0.3),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                icon,
-                size: 36,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF064E3B),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                description,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: const Color(0xFF6B7280),
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  IconData _getIcon(String iconName) {
+    switch (iconName.toLowerCase()) {
+      case 'psychology':
+        return Icons.psychology;
+      case 'cloud':
+        return Icons.cloud;
+      case 'people':
+        return Icons.people;
+      case 'self_improvement':
+        return Icons.self_improvement;
+      case 'bedtime':
+        return Icons.bedtime;
+      case 'spa':
+        return Icons.spa;
+      default:
+        return Icons.spa;
+    }
   }
 }
