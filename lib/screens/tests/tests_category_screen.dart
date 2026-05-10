@@ -56,7 +56,7 @@ class TestsCategoryScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: const Color(0xFF10B981),
-                        width: 1.2, // 🔹 İNCE KENARLIK (eskiden 2 idi)
+                        width: 1.2,
                       ),
                     ),
                     child: Material(
@@ -68,8 +68,7 @@ class TestsCategoryScreen extends StatelessWidget {
                             builder: (context) => TestsScreen(
                               categoryId: id,
                               categoryName: name,
-                              categoryColor: color,
-                              categoryIcon: iconName,
+                              // ✅ Hata veren parametreler kaldırıldı
                             ),
                           ),
                         ),
@@ -77,14 +76,12 @@ class TestsCategoryScreen extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 18,
-                            vertical:
-                                24, // 🔹 YÜKSEKLİK ARTIRILDI (eskiden 16 idi)
+                            vertical: 24,
                           ),
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(
-                                    14), // 🔹 İKON PADDING BÜYÜDÜ
+                                padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
                                   color: color.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(18),
@@ -92,8 +89,7 @@ class TestsCategoryScreen extends StatelessWidget {
                                 child: Icon(
                                   _getIcon(iconName),
                                   color: color,
-                                  size:
-                                      44, // 🔹 İKON BOYUTU BÜYÜDÜ (eskiden 32 idi)
+                                  size: 44,
                                 ),
                               ),
                               const SizedBox(width: 18),

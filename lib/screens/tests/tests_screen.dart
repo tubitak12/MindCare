@@ -5,31 +5,28 @@ import 'tests_detail_screen.dart';
 class TestsScreen extends StatelessWidget {
   final String categoryId;
   final String categoryName;
-  final Color categoryColor;
-  final String? categoryIcon;
 
   const TestsScreen({
     super.key,
     required this.categoryId,
     required this.categoryName,
-    required this.categoryColor,
-    this.categoryIcon,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Kategori ekranındaki ile aynı renkler
+    const Color primaryGreen = Color(0xFF10B981);
+    const Color darkText = Color(0xFF064E3B);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(_parseIcon(categoryIcon ?? 'spa'),
-                size: 24, color: Colors.white),
-            const SizedBox(width: 10),
-            Text(categoryName, style: const TextStyle(color: Colors.white)),
-          ],
+        title: Text(
+          categoryName,
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: categoryColor,
+        backgroundColor: primaryGreen,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -43,36 +40,15 @@ class TestsScreen extends StatelessWidget {
             .orderBy('order')
             .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text('Hata: ${snapshot.error}'),
-                ],
-              ),
-            );
-          }
-
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child: CircularProgressIndicator(color: primaryGreen));
           }
 
           final tests = snapshot.data!.docs;
-
           if (tests.isEmpty) {
             return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.assignment_turned_in,
-                      size: 48, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('Bu kategoride henüz test yok.'),
-                ],
-              ),
+              child: Text('Bu kategoride henüz test bulunmuyor.'),
             );
           }
 
@@ -83,53 +59,51 @@ class TestsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final test = tests[index];
               final data = test.data() as Map<String, dynamic>;
-
               final String testId = test.id;
-              final String title = data['title'] ?? 'Test';
-              final String subtitle = data['subtitle'] ?? '';
+              final String title = data['title'] ?? 'İsimsiz Test';
               final int questionCount = data['questionCount'] ?? 0;
 
               return Container(
+                // 🔹 KENARLIK BURADA AYARLANDI (Kategori ekranıyla aynı)
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFF10B981),
-                    width: 1.2,
+                    color: primaryGreen, // Mint Yeşil Kenarlık
+                    width: 1.2, // İnce kenarlık
                   ),
                 ),
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => TestsDetailScreen(
                           testId: testId,
                           testTitle: title,
-                          themeColor: categoryColor,
-                          categoryId: categoryId, // ✅ EKLENDİ
+                          categoryId: categoryId,
                         ),
                       ),
                     ),
-                    borderRadius: BorderRadius.circular(20),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 18,
-                        vertical: 20,
+                        vertical: 20, // Kategori kartlarına yakın bir yükseklik
                       ),
                       child: Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: categoryColor.withOpacity(0.1),
+                              color: primaryGreen.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Icon(
-                              Icons.assignment,
-                              color: categoryColor,
-                              size: 32,
+                            child: const Icon(
+                              Icons.assignment_outlined,
+                              color: primaryGreen,
+                              size: 28,
                             ),
                           ),
                           const SizedBox(width: 18),
@@ -141,48 +115,16 @@ class TestsScreen extends StatelessWidget {
                                   title,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                    fontSize: 17,
+                                    color: darkText,
                                   ),
                                 ),
-                                if (subtitle.isNotEmpty) ...[
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    subtitle,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                                const SizedBox(height: 10),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF10B981)
-                                        .withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.help_outline,
-                                        size: 14,
-                                        color: Color(0xFF10B981),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                        '$questionCount Soru',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF10B981),
-                                        ),
-                                      ),
-                                    ],
+                                const SizedBox(height: 4),
+                                Text(
+                                  '$questionCount Soru',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 13,
                                   ),
                                 ),
                               ],
@@ -204,24 +146,5 @@ class TestsScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  IconData _parseIcon(String iconName) {
-    switch (iconName.toLowerCase()) {
-      case 'psychology':
-        return Icons.psychology;
-      case 'cloud':
-        return Icons.cloud;
-      case 'people':
-        return Icons.people;
-      case 'self_improvement':
-        return Icons.self_improvement;
-      case 'bedtime':
-        return Icons.bedtime;
-      case 'spa':
-        return Icons.spa;
-      default:
-        return Icons.spa;
-    }
   }
 }
