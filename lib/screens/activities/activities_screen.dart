@@ -10,44 +10,47 @@ class ActivitiesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryGreen = Color(0xFF10B981);
-    const Color darkText = Color(0xFF064E3B);
-
+    // Testlerdeki gibi soft renkler ve tasarım
     final activities = [
       {
         'title': '4-7-8 Nefesi',
         'description': 'Rahatlatıcı nefes tekniği',
         'icon': Icons.air,
+        'color': const Color(0xFF10B981), 
         'screen': 'breathing'
       },
       {
         'title': 'Kutu Nefesi',
         'description': 'Odaklanma için',
         'icon': Icons.air,
+        'color': const Color(0xFF3B82F6),
         'screen': 'box'
       },
       {
         'title': 'Diyafram Nefesi',
         'description': 'Derin nefes alma',
         'icon': Icons.air,
+        'color': const Color(0xFF8B5CF6),
         'screen': 'diaphragm'
       },
       {
         'title': 'Anı Yaşama Pratiği',
         'description': 'Farkındalık',
         'icon': Icons.self_improvement,
+        'color': const Color(0xFFF59E0B),
         'screen': 'mindfulness'
       },
       {
         'title': 'Vücut Taraması',
         'description': 'Farkındalık',
         'icon': Icons.self_improvement,
+        'color': const Color(0xFFEC4899),
         'screen': 'bodyscan'
       },
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
+      backgroundColor: const Color(0xFFF0FDF4), // Testlerle aynı arka plan
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: activities.length,
@@ -58,6 +61,7 @@ class ActivitiesScreen extends StatelessWidget {
           final String title = activity['title'] as String;
           final String description = activity['description'] as String;
           final IconData icon = activity['icon'] as IconData;
+          final Color color = activity['color'] as Color;
           final String screen = activity['screen'] as String;
 
           return Container(
@@ -65,7 +69,7 @@ class ActivitiesScreen extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: primaryGreen,
+                color: const Color(0xFF10B981), // Testlerle aynı border rengi
                 width: 1.2,
               ),
             ),
@@ -81,15 +85,16 @@ class ActivitiesScreen extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
+                      // Testlerdeki gibi soft ikon container
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: primaryGreen.withOpacity(0.1),
+                          color: color.withOpacity(0.1), // Soft arka plan
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: Icon(
                           icon,
-                          color: primaryGreen,
+                          color: color,
                           size: 44,
                         ),
                       ),
@@ -104,20 +109,17 @@ class ActivitiesScreen extends StatelessWidget {
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: darkText,
+                                color: Colors.black87,
                               ),
                             ),
-
-                            if (description.isNotEmpty) ...[
-                              const SizedBox(height: 6),
-                              Text(
-                                description,
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 13,
-                                ),
+                            const SizedBox(height: 6),
+                            Text(
+                              description,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 13,
                               ),
-                            ],
+                            ),
                           ],
                         ),
                       ),
