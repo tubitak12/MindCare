@@ -10,234 +10,181 @@ class ActivitiesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildCategoryCard(
-              context,
-              'Meditasyon',
-              'Zihnini dinlendir',
-              Icons.self_improvement,
-              const Color(0xFF10B981),
-              [
-                {
-                  'title': '5 Dakika Nefes',
-                  'duration': '5 dk',
-                  'description': 'Derin nefes egzersizi'
-                },
-                {
-                  'title': '10 Dakika Farkındalık',
-                  'duration': '10 dk',
-                  'description': 'Anı yaşama pratiği'
-                },
-                {
-                  'title': 'Vücut Taraması',
-                  'duration': '10 dk',
-                  'description': 'Vücut farkındalığı'
-                },
-              ],
-            ),
-            const SizedBox(height: 16),
+    const Color primaryGreen = Color(0xFF10B981);
+    const Color darkText = Color(0xFF064E3B);
 
-            _buildCategoryCard(
-              context,
-              'Nefes Egzersizleri',
-              'Derin nefes al',
-              Icons.air,
-              const Color(0xFF10B981),
-              [
-                {
-                  'title': '4-7-8 Nefesi',
-                  'duration': '2 dk',
-                  'description': 'Rahatlatıcı nefes tekniği'
-                },
-                {
-                  'title': 'Kutu Nefesi',
-                  'duration': '3 dk',
-                  'description': 'Odaklanma için'
-                },
-                {
-                  'title': 'Diyafram Nefesi',
-                  'duration': '5 dk',
-                  'description': 'Derin nefes alma'
-                },
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryCard(
-    BuildContext context,
-    String title,
-    String subtitle,
-    IconData icon,
-    Color color,
-    List<Map<String, String>> items,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: (0.1 * 255).toDouble()),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: color),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF064E3B),
-                      ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: Color(0xFF6B7280),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          ...items.map((item) => _buildActivityItem(
-                context,
-                item['title']!,
-                item['duration']!,
-                item['description']!,
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivityItem(
-    BuildContext context,
-    String title,
-    String duration,
-    String description,
-  ) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Color(0xFFF0FDF4),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(
-          Icons.play_circle_fill,
-          color: Color(0xFF10B981),
-          size: 24,
-        ),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF064E3B),
-        ),
-      ),
-      subtitle: Text(
-        description,
-        style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-      ),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: Color(0xFFF0FDF4),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          duration,
-          style: const TextStyle(
-            fontSize: 11,
-            color: Color(0xFF10B981),
-          ),
-        ),
-      ),
-      onTap: () {
-        switch (title) {
-          case '4-7-8 Nefesi':
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    const be.BreathingExerciseScreen(),
-              ),
-            );
-            break;
-
-          case 'Kutu Nefesi':
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    const bb.BoxBreathingScreen(),
-              ),
-            );
-            break;
-
-          case 'Diyafram Nefesi':
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    const db.DiaphragmBreathingScreen(),
-              ),
-            );
-            break;
-
-          case '10 Dakika Farkındalık': // ✅ EKLENDİ
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ColorFocusGame(),
-              ),
-            );
-            break;
-
-          case 'Vücut Taraması':
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const DeepBodyScanScreen(totalDuration: 300),
-              ),
-            );
-            break;
-
-          default:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('$title yakında eklenecek 🧘'),
-                backgroundColor: Color(0xFF10B981),
-              ),
-            );
-        }
+    final activities = [
+      {
+        'title': '4-7-8 Nefesi',
+        'description': 'Rahatlatıcı nefes tekniği',
+        'icon': Icons.air,
+        'screen': 'breathing'
       },
+      {
+        'title': 'Kutu Nefesi',
+        'description': 'Odaklanma için',
+        'icon': Icons.air,
+        'screen': 'box'
+      },
+      {
+        'title': 'Diyafram Nefesi',
+        'description': 'Derin nefes alma',
+        'icon': Icons.air,
+        'screen': 'diaphragm'
+      },
+      {
+        'title': 'Anı Yaşama Pratiği',
+        'description': 'Farkındalık',
+        'icon': Icons.self_improvement,
+        'screen': 'mindfulness'
+      },
+      {
+        'title': 'Vücut Taraması',
+        'description': 'Farkındalık',
+        'icon': Icons.self_improvement,
+        'screen': 'bodyscan'
+      },
+    ];
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF0FDF4),
+      body: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: activities.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final activity = activities[index];
+
+          final String title = activity['title'] as String;
+          final String description = activity['description'] as String;
+          final IconData icon = activity['icon'] as IconData;
+          final String screen = activity['screen'] as String;
+
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: primaryGreen,
+                width: 1.2,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => _navigateToActivity(context, screen),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 24,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: primaryGreen.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Icon(
+                          icon,
+                          color: primaryGreen,
+                          size: 44,
+                        ),
+                      ),
+                      const SizedBox(width: 18),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: darkText,
+                              ),
+                            ),
+
+                            if (description.isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                description,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 18,
+                        color: Colors.grey[400],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
+  }
+
+  void _navigateToActivity(BuildContext context, String screen) {
+    switch (screen) {
+      case 'breathing':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const be.BreathingExerciseScreen(),
+          ),
+        );
+        break;
+
+      case 'box':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const bb.BoxBreathingScreen(),
+          ),
+        );
+        break;
+
+      case 'diaphragm':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const db.DiaphragmBreathingScreen(),
+          ),
+        );
+        break;
+
+      case 'mindfulness':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ColorFocusGame(),
+          ),
+        );
+        break;
+
+      case 'bodyscan':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                const DeepBodyScanScreen(totalDuration: 600),
+          ),
+        );
+        break;
+    }
   }
 }
