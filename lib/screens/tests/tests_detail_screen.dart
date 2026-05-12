@@ -23,11 +23,20 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
   int currentIndex = 0;
   int score = 0;
   List<int?> selectedAnswers = [];
-  Map<int, int> answersMap = {}; // CEVAPLARI SAKLAMAK İÇİN EKLENDİ
+  Map<int, int> answersMap = {};
 
   final Color primaryGreen = const Color(0xFF10B981);
   final Color darkText = const Color(0xFF064E3B);
   final Color mintBg = const Color(0xFFD1FAE5);
+
+  // Bitki emojisini ilerlemeye göre belirleyen yardımcı fonksiyon
+  String _getPlantEmoji(double progress) {
+    if (progress < 0.2) return '🌱'; // Filiz
+    if (progress < 0.4) return '🌿'; // Yapraklanma
+    if (progress < 0.6) return '🪴'; // Büyüme
+    if (progress < 0.8) return '🌳'; // Ağaçlanma
+    return '🌸'; // Çiçek açma (Son aşama)
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,12 +106,52 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
         final qData = questions[currentIndex].data() as Map<String, dynamic>;
         final List<String> options = List<String>.from(qData['options'] ?? []);
 
+        // İlerleme yüzdesi (0.0 ile 1.0 arasında)
+        final double progress = (currentIndex + 1) / questions.length;
+
         return Column(
           children: [
+            // --- YENİ EKLENEN BİTKİ ANİMASYONU ALANI ---
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              width: double.infinity,
+              color: Colors.white.withOpacity(0.5),
+              child: Column(
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                          // Ölçekleme (büyüme) animasyonu
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
+                    child: Text(
+                      _getPlantEmoji(progress),
+                      key: ValueKey<String>(_getPlantEmoji(progress)),
+                      style: const TextStyle(fontSize: 55),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "İyileşme yolculuğun devam ediyor...",
+                    style: TextStyle(
+                      color: primaryGreen.withOpacity(0.8),
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // -------------------------------------------
             LinearProgressIndicator(
-              value: (currentIndex + 1) / questions.length,
+              value: progress,
               color: primaryGreen,
               backgroundColor: mintBg,
+              minHeight: 6,
             ),
             Expanded(
               child: ListView(
@@ -141,7 +190,6 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
                 () {
                   if (selectedAnswers[currentIndex] == null) return;
 
-                  // ✅ CEVAPLARI KAYDET
                   answersMap[currentIndex] = selectedAnswers[currentIndex]!;
 
                   if (currentIndex < questions.length - 1) {
@@ -182,8 +230,6 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
   }
 
   void _finishTest(int total) {
-    // Basit skor hesaplama (her cevap 0-3 arası puan)
-    // selectedAnswers null değilse, değeri kadar puan ekle
     int finalScore = 0;
     for (var answer in selectedAnswers) {
       if (answer != null) {
@@ -191,10 +237,8 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
       }
     }
 
-    // Maksimum skor: soru sayısı * 3 (her soru için max 3 puan)
     int maxScore = total * 3;
 
-    // ✅ RESULT EKRANINA TÜM PARAMETRELERİ GÖNDER
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -203,8 +247,8 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
           testName: widget.testTitle,
           score: finalScore,
           maxScore: maxScore,
-          answers: answersMap, // ✅ EKLENDİ
-          testColor: primaryGreen, // ✅ EKLENDİ
+          answers: answersMap,
+          testColor: primaryGreen,
           categoryId: widget.categoryId,
         ),
       ),

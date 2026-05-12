@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class ChatScreen extends StatefulWidget {
   final String userName;
@@ -26,8 +28,9 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<_ChatMessage> _messages = [];
   bool _isLoading = false;
 
-  // Google Generative Language API anahtarı
-  static const String _apiKey = String.fromEnvironment('GOOGLE_API_KEY', defaultValue: '');
+  // Rate limiting ayarları
+  final List<DateTime> _messageTimestamps = [];
+  static const int _maxMessagesPerMinute = 5;
 
   String get _systemPrompt =>
       'Sen MindCare uygulamasının yapay zeka asistanısın. '
@@ -49,38 +52,47 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<String> _generateReply(String userText) async {
-    final promptText = '$_systemPrompt\n\nKullanıcı: $userText\nAsistan:';
+    final apiKey = dotenv.env['OPENROUTER_API_KEY'] ?? '';
+    final model = dotenv.env['DEFAULT_MODEL'] ?? 'openai/gpt-oss-120b:free';
 
-    if (_apiKey.isEmpty) {
-      throw 'Lütfen GOOGLE_API_KEY ile geçerli bir API anahtarı sağlayın.';
+    if (apiKey.isEmpty) {
+      throw 'API anahtarı bulunamadı. Lütfen .env dosyasını kontrol edin.';
     }
 
-    final url = Uri.https(
-      'generativelanguage.googleapis.com',
-      '/v1beta1/models/text-bison-001:generateText',
-      {'key': _apiKey},
-    );
+    final url = Uri.parse('https://openrouter.ai/api/v1/chat/completions');
 
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $apiKey',
+        'HTTP-Referer': 'https://github.com/mindcare', // İsteğe bağlı
+        'X-Title': 'MindCare App', // İsteğe bağlı
+      },
       body: jsonEncode({
-        'prompt': {'text': promptText},
+        'model': model,
+        'messages': [
+          {'role': 'system', 'content': _systemPrompt},
+          {'role': 'user', 'content': userText},
+        ],
         'temperature': 0.7,
-        'maxOutputTokens': 256,
       }),
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final candidates = data['candidates'] as List<dynamic>?;
-      final output = candidates?.isNotEmpty == true
-          ? (candidates!.first as Map<String, dynamic>)['output'] as String?
+      final choices = data['choices'] as List<dynamic>?;
+      final output = choices?.isNotEmpty == true
+          ? (choices!.first as Map<String, dynamic>)['message']['content'] as String?
           : null;
 
       if (output != null && output.isNotEmpty) {
         return output.trim();
       }
+    } else if (response.statusCode == 429) {
+      throw 'Çok fazla istek gönderdiniz. Lütfen biraz bekleyip tekrar deneyin. (Limit Aşıldı)';
+    } else {
+      throw 'Sunucu hatası: ${response.statusCode} - ${response.body}';
     }
 
     throw 'Yanıt alınamadı. Lütfen tekrar deneyin.';
@@ -89,6 +101,20 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
+
+    // Rate limiting kontrolü
+    final now = DateTime.now();
+    _messageTimestamps.removeWhere((timestamp) => now.difference(timestamp).inSeconds > 60);
+    if (_messageTimestamps.length >= _maxMessagesPerMinute) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen yavaşlayın! Dakikada en fazla 5 mesaj gönderebilirsiniz.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    _messageTimestamps.add(now);
 
     _controller.clear();
     setState(() {
@@ -304,12 +330,31 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
               ),
-              child: Text(
-                message.text,
-                style: TextStyle(
-                  color: isUser ? Colors.white : const Color(0xFF064E3B),
-                  fontSize: 14,
-                  height: 1.4,
+              child: MarkdownBody(
+                data: message.text,
+                selectable: true,
+                styleSheet: MarkdownStyleSheet(
+                  p: TextStyle(
+                    color: isUser ? Colors.white : const Color(0xFF064E3B),
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                  strong: TextStyle(
+                    color: isUser ? Colors.white : const Color(0xFF064E3B),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                  em: TextStyle(
+                    color: isUser ? Colors.white : const Color(0xFF064E3B),
+                    fontStyle: FontStyle.italic,
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                  listBullet: TextStyle(
+                    color: isUser ? Colors.white : const Color(0xFF064E3B),
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),

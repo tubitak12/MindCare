@@ -3,10 +3,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 import 'screens/login_screen.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('tr', null);
+  
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint("Uyarı: .env dosyası bulunamadı. Ortam değişkenleri tanımlı olmayabilir.");
+  }
 
   try {
     await Firebase.initializeApp(
