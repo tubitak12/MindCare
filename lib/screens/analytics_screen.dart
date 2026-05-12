@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
+import 'dart:async';
 import 'dart:ui' as ui;
 
 class AnalyticsScreen extends StatefulWidget {
@@ -24,12 +25,24 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   double _avgMood = 0;
   double _improvement = 0;
   bool _isLoading = true;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _loadAnalytics();
+    // Her 10 saniyede bir verileri yenile
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _loadAnalytics();
+    });
   }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
 
   Future<void> _loadAnalytics() async {
     final userId = _auth.currentUser?.uid;
@@ -67,10 +80,26 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           .where('timestamp', isGreaterThanOrEqualTo: eightDaysAgoTimestamp)
           .get();
 
-      final results = await Future.wait([diariesFuture, testsFuture, chatsFuture]);
+      final moodLogsFuture = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('mood_logs')
+          .where('timestamp', isGreaterThanOrEqualTo: eightDaysAgoTimestamp)
+          .get();
+
+      final activitiesFuture = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('activities')
+          .where('timestamp', isGreaterThanOrEqualTo: eightDaysAgoTimestamp)
+          .get();
+
+      final results = await Future.wait([diariesFuture, testsFuture, chatsFuture, moodLogsFuture, activitiesFuture]);
       final diaries = results[0].docs;
       final tests = results[1].docs;
       final chats = results[2].docs;
+      final moodLogs = results[3].docs;
+      final activities = results[4].docs;
 
       // Gün gün ayırmak için Map'ler
       Map<String, List<double>> dailyMoods = {};
@@ -108,6 +137,26 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
       // Chatleri işle
       for (var doc in chats) {
+        final data = doc.data();
+        final dateKey = data['dateKey'] as String? ?? '';
+        if (dailyActivities.containsKey(dateKey)) {
+          dailyActivities[dateKey] = dailyActivities[dateKey]! + 1; // Aktivite sayıldı
+        }
+      }
+
+      // Mood loglarını işle (ruh hali seçimi)
+      for (var doc in moodLogs) {
+        final data = doc.data();
+        final dateKey = data['dateKey'] as String? ?? '';
+        if (dailyActivities.containsKey(dateKey)) {
+          dailyActivities[dateKey] = dailyActivities[dateKey]! + 1; // Aktivite sayıldı
+          final emoji = data['emoji'] as String? ?? '😐';
+          dailyMoods[dateKey]!.add(_emojiToScore(emoji));
+        }
+      }
+
+      // Genel aktiviteleri işle (kurabiye kırma vs)
+      for (var doc in activities) {
         final data = doc.data();
         final dateKey = data['dateKey'] as String? ?? '';
         if (dailyActivities.containsKey(dateKey)) {
@@ -162,23 +211,26 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     } catch (e) {
       debugPrint('Analiz verileri yüklenirken hata: $e');
       if (mounted) {
-        // Hata durumunda örnek veri göster
-        final rng = Random();
-        setState(() {
-          _moodData = List.generate(8, (_) => 55 + rng.nextDouble() * 35);
-          _activityData = List.generate(8, (_) => (rng.nextInt(6) + 1).toDouble());
-          _dateLabels = List.generate(8, (i) {
-            final d = DateTime.now().subtract(Duration(days: 7 - i));
-            return DateFormat('dd MMM', 'tr').format(d);
+        // Hata durumunda en son geçerli veriyi saklayıp, tekrar denemesini sağla
+        // Eğer veri yoksa, boş durumu göster
+        if (_moodData.isEmpty) {
+          setState(() {
+            _moodData = List.generate(8, (_) => 0.0);
+            _activityData = List.generate(8, (_) => 0.0);
+            _dateLabels = List.generate(8, (i) {
+              final d = DateTime.now().subtract(Duration(days: 7 - i));
+              return DateFormat('dd MMM', 'tr').format(d);
+            });
+            _activeDays = 0;
+            _totalActivities = 0;
+            _avgMood = 0;
+            _improvement = 0;
+            _isLoading = false;
           });
-          _activeDays = 8;
-          _totalActivities = _activityData.reduce((a, b) => a + b).toInt();
-          _avgMood = _moodData.reduce((a, b) => a + b) / _moodData.length;
-          double fh = _moodData.sublist(0, 4).reduce((a, b) => a + b) / 4;
-          double sh = _moodData.sublist(4).reduce((a, b) => a + b) / 4;
-          _improvement = fh > 0 ? ((sh - fh) / fh * 100) : 0;
-          _isLoading = false;
-        });
+        } else {
+          // Önceki geçerli veriyi saklı tutup, loading'i kapat
+          setState(() => _isLoading = false);
+        }
       }
     }
   }

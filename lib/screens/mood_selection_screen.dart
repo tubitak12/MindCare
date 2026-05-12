@@ -42,6 +42,17 @@ class _MoodSelectionScreenState extends State<MoodSelectionScreen> {
             'last_emoji': selectedEmoji!,
           }, SetOptions(merge: true));
       
+      // Mood seçimini aktivite olarak kaydet (analytics için)
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('mood_logs')
+          .add({
+            'emoji': selectedEmoji!,
+            'timestamp': FieldValue.serverTimestamp(),
+            'dateKey': today,
+          });
+      
       // SharedPreferences'a da kaydet (local cache için)
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('last_mood_date', today);

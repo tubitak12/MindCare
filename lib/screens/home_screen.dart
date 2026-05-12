@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'package:mindcare_app/screens/activities/activities_screen.dart';
 import 'package:mindcare_app/screens/tests/tests_category_screen.dart';
 import 'daily_screen.dart';
@@ -41,11 +43,39 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _playingTitle;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
     _loadMotivationalMessages();
+    _checkDailyCookieReset();
+  }
+
+  Future<void> _checkDailyCookieReset() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      final lastBreakDate = userDoc.data()?['last_cookie_break_date'] as String?;
+      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+      // Eğer tarih farklıysa, kurabiye sıfırla
+      if (lastBreakDate != today) {
+        setState(() {
+          _isCookieBroken = false;
+          _cookieMessage = "Kurabiyeyi kır ve günün mesajını al!";
+        });
+      } else {
+        // Aynı gün ve kırıldıysa, state'i güncelleyin
+        setState(() {
+          _isCookieBroken = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Kurabiye tarihi kontrol edilirken hata: $e');
+    }
   }
 
   Future<void> _loadMotivationalMessages() async {
@@ -103,8 +133,43 @@ class _HomeScreenState extends State<HomeScreen> {
             _motivationalMessages.length];
   }
 
-  void _breakCookie() {
-    if (_isCookieBroken) return;
+  void _breakCookie() async {
+    if (_isCookieBroken) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Kurabiye günde sadece 1 kez kırılabilir! Yarın tekrar dene 🍪'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Color(0xFF10B981),
+        ),
+      );
+      return;
+    }
+
+    final user = _auth.currentUser;
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    // Firebase'e tarih kaydet
+    if (user != null) {
+      try {
+        await _firestore.collection('users').doc(user.uid).set({
+          'last_cookie_break_date': today,
+          'last_cookie_break_time': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+
+        // Activity olarak kaydet
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('activities')
+            .add({
+          'type': 'cookie_break',
+          'timestamp': FieldValue.serverTimestamp(),
+          'dateKey': today,
+        });
+      } catch (e) {
+        debugPrint('Kurabiye tarihi kaydedilirken hata: $e');
+      }
+    }
 
     setState(() {
       _isCookieBroken = true;
@@ -292,17 +357,65 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
-            Icon(
-              _isCookieBroken ? Icons.cookie_outlined : Icons.cookie,
-              size: 60,
-              color: const Color(0xFF10B981),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              _cookieMessage,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.black87),
-            ),
+            // Kırılmamış kurabiye gösterimi
+            if (!_isCookieBroken) ...[
+              Icon(
+                Icons.cookie,
+                size: 80,
+                color: const Color(0xFF10B981),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                _cookieMessage,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF6B7280),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ]
+            // Kırılmış kurabiye - yeşil kart gösterimi
+            else ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      '✨',
+                      style: TextStyle(fontSize: 32),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _cookieMessage,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        height: 1.6,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      '— Bugünün Mesajı',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFFD1F4E5),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),

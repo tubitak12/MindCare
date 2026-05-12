@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -24,36 +26,64 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<_ChatMessage> _messages = [];
   bool _isLoading = false;
 
-  // Gemini API anahtarı
-  static const String _apiKey = 'AIzaSyBJmCASVpFGJqxpvbaLAoHpWmUr93jGfiI';
+  // Google Generative Language API anahtarı
+  static const String _apiKey = String.fromEnvironment('GOOGLE_API_KEY', defaultValue: '');
 
-  late final GenerativeModel _model;
-  late final ChatSession _chat;
+  String get _systemPrompt =>
+      'Sen MindCare uygulamasının yapay zeka asistanısın. '
+      'Adın "MindCare Asistan". '
+      'Kullanıcının adı "${widget.userName}" ve bugünkü ruh hali "${widget.userEmoji}". '
+      'Türkçe konuş. Empatik, sıcak ve destekleyici ol. '
+      'Ruh sağlığı, stres yönetimi, motivasyon ve kişisel gelişim konularında yardımcı ol. '
+      'Kısa ve anlaşılır cevaplar ver. Emoji kullan ama abartma. '
+      'Tıbbi tavsiye verme, gerektiğinde profesyonel destek almayı öner.';
 
   @override
   void initState() {
     super.initState();
-    _model = GenerativeModel(
-      model: 'gemini-2.0-flash',
-      apiKey: _apiKey,
-      systemInstruction: Content.text(
-        'Sen MindCare uygulamasının yapay zeka asistanısın. '
-        'Adın "MindCare Asistan". '
-        'Kullanıcının adı "${widget.userName}" ve bugünkü ruh hali "${widget.userEmoji}". '
-        'Türkçe konuş. Empatik, sıcak ve destekleyici ol. '
-        'Ruh sağlığı, stres yönetimi, motivasyon ve kişisel gelişim konularında yardımcı ol. '
-        'Kısa ve anlaşılır cevaplar ver. Emoji kullan ama abartma. '
-        'Tıbbi tavsiye verme, gerektiğinde profesyonel destek almayı öner.',
-      ),
-    );
-    _chat = _model.startChat();
-
-    // Karşılama mesajı
     _messages.add(_ChatMessage(
       text: 'Merhaba ${widget.userName}! 🌿 Ben MindCare Asistanı. '
           'Bugün sana nasıl yardımcı olabilirim?',
       isUser: false,
     ));
+  }
+
+  Future<String> _generateReply(String userText) async {
+    final promptText = '$_systemPrompt\n\nKullanıcı: $userText\nAsistan:';
+
+    if (_apiKey.isEmpty) {
+      throw 'Lütfen GOOGLE_API_KEY ile geçerli bir API anahtarı sağlayın.';
+    }
+
+    final url = Uri.https(
+      'generativelanguage.googleapis.com',
+      '/v1beta1/models/text-bison-001:generateText',
+      {'key': _apiKey},
+    );
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'prompt': {'text': promptText},
+        'temperature': 0.7,
+        'maxOutputTokens': 256,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final candidates = data['candidates'] as List<dynamic>?;
+      final output = candidates?.isNotEmpty == true
+          ? (candidates!.first as Map<String, dynamic>)['output'] as String?
+          : null;
+
+      if (output != null && output.isNotEmpty) {
+        return output.trim();
+      }
+    }
+
+    throw 'Yanıt alınamadı. Lütfen tekrar deneyin.';
   }
 
   Future<void> _sendMessage() async {
@@ -84,8 +114,7 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       }
 
-      final response = await _chat.sendMessage(Content.text(text));
-      final reply = response.text ?? 'Üzgünüm, bir sorun oluştu.';
+      final reply = await _generateReply(text);
 
       if (mounted) {
         setState(() {
