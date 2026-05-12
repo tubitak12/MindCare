@@ -214,8 +214,8 @@ class _DailyScreenState extends State<DailyScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -227,10 +227,10 @@ class _DailyScreenState extends State<DailyScreen> {
               const SizedBox(height: 30),
               Text(
                 _isFirstTime ? 'Günlük Şifresi Oluştur' : 'Günlük Şifresi',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF064E3B),
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 10),
@@ -260,7 +260,7 @@ class _DailyScreenState extends State<DailyScreen> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: Theme.of(context).cardColor,
                 ),
               ),
               if (_isFirstTime) ...[
@@ -280,7 +280,7 @@ class _DailyScreenState extends State<DailyScreen> {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Theme.of(context).cardColor,
                   ),
                 ),
               ],
@@ -332,13 +332,13 @@ class _DailyScreenState extends State<DailyScreen> {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     'Günlüğüm',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF064E3B),
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                   SizedBox(height: 4),
@@ -371,7 +371,7 @@ class _DailyScreenState extends State<DailyScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -385,27 +385,27 @@ class _DailyScreenState extends State<DailyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  children: const [
-                    Icon(Icons.menu_book, color: Color(0xFF10B981)),
-                    SizedBox(width: 8),
+                  children: [
+                    const Icon(Icons.menu_book, color: Color(0xFF10B981)),
+                    const SizedBox(width: 8),
                     Text(
                       'Yeni Kayıt',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF064E3B),
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 
-                const Text(
+                Text(
                   'Başlık',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF064E3B),
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -415,7 +415,7 @@ class _DailyScreenState extends State<DailyScreen> {
                     hintText: 'Bugünün başlığı...',
                     hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
                     filled: true,
-                    fillColor: const Color(0xFFF9FAFB),
+                    fillColor: Theme.of(context).scaffoldBackgroundColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey.shade200),
@@ -433,12 +433,12 @@ class _DailyScreenState extends State<DailyScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                const Text(
+                Text(
                   'İçerik',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF064E3B),
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -449,7 +449,7 @@ class _DailyScreenState extends State<DailyScreen> {
                     hintText: 'Bugün neler oldu? Nasıl hissediyorsunuz?',
                     hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
                     filled: true,
-                    fillColor: const Color(0xFFF9FAFB),
+                    fillColor: Theme.of(context).scaffoldBackgroundColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey.shade200),
@@ -500,12 +500,12 @@ class _DailyScreenState extends State<DailyScreen> {
           
           const SizedBox(height: 30),
           
-          const Text(
+          Text(
             'Önceki Kayıtlar',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF064E3B),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 16),
@@ -542,7 +542,7 @@ class _DailyScreenState extends State<DailyScreen> {
               return Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Center(
@@ -586,11 +586,13 @@ class _DailyScreenState extends State<DailyScreen> {
   }
 
   Widget _buildHistoryCard(String title, String content, DateTime date) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+    return GestureDetector(
+      onTap: () => _showDiaryDetails(context, title, content, date),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -622,10 +624,10 @@ class _DailyScreenState extends State<DailyScreen> {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF064E3B),
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -643,9 +645,9 @@ class _DailyScreenState extends State<DailyScreen> {
                 const SizedBox(height: 8),
                 Text(
                   content,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF4B5563),
+                    color: Theme.of(context).textTheme.bodyMedium?.color ?? const Color(0xFF4B5563),
                     height: 1.4,
                   ),
                   maxLines: 2,
@@ -656,13 +658,48 @@ class _DailyScreenState extends State<DailyScreen> {
           ),
         ],
       ),
+      ),
+    );
+  }
+
+  void _showDiaryDetails(BuildContext context, String title, String content, DateTime date) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Text(
+              content,
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+                height: 1.5,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Kapat', style: TextStyle(color: Color(0xFF10B981))),
+            ),
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4), // Hafif mint arkaplan
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Hafif mint arkaplan
       // AppBar'ı tamamen kaldırdık çünkü başlık kısmı gövdeye entegre edildi.
       body: SafeArea(
         child: _isPasswordScreen ? _buildPasswordScreen() : _buildDiaryScreen(),

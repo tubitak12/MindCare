@@ -118,8 +118,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         final dateKey = data['dateKey'] as String? ?? '';
         if (dailyActivities.containsKey(dateKey)) {
           dailyActivities[dateKey] = dailyActivities[dateKey]! + 1; // Aktivite sayıldı
-          final moodEmoji = data['mood'] as String? ?? '😐';
-          dailyMoods[dateKey]!.add(_emojiToScore(moodEmoji));
         }
       }
 
@@ -247,6 +245,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       case '😊': return 80;
       case '😃': return 85;
       case '🤩': return 95;
+      case '😲': return 60;
       default: return 50;
     }
   }
@@ -265,12 +264,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Başlık
-          const Text(
+          Text(
             'Analizler',
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF064E3B),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 4),
@@ -377,7 +376,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -410,10 +409,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF064E3B),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
         ],
@@ -434,7 +433,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -449,10 +448,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF064E3B),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 4),

@@ -185,7 +185,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: const Color(0xFF10B981),
         elevation: 0,
@@ -242,7 +242,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
@@ -261,7 +261,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         hintText: 'Mesajınızı yazın...',
                         hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
                         filled: true,
-                        fillColor: const Color(0xFFF0FDF4),
+                        fillColor: Theme.of(context).scaffoldBackgroundColor,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 10,
@@ -315,7 +315,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isUser ? const Color(0xFF10B981) : Colors.white,
+                color: isUser ? const Color(0xFF10B981) : Theme.of(context).cardColor,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(18),
                   topRight: const Radius.circular(18),
@@ -335,24 +335,24 @@ class _ChatScreenState extends State<ChatScreen> {
                 selectable: true,
                 styleSheet: MarkdownStyleSheet(
                   p: TextStyle(
-                    color: isUser ? Colors.white : const Color(0xFF064E3B),
+                    color: isUser ? Colors.white : (Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF064E3B)),
                     fontSize: 14,
                     height: 1.4,
                   ),
                   strong: TextStyle(
-                    color: isUser ? Colors.white : const Color(0xFF064E3B),
+                    color: isUser ? Colors.white : (Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF064E3B)),
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                     height: 1.4,
                   ),
                   em: TextStyle(
-                    color: isUser ? Colors.white : const Color(0xFF064E3B),
+                    color: isUser ? Colors.white : (Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF064E3B)),
                     fontStyle: FontStyle.italic,
                     fontSize: 14,
                     height: 1.4,
                   ),
                   listBullet: TextStyle(
-                    color: isUser ? Colors.white : const Color(0xFF064E3B),
+                    color: isUser ? Colors.white : (Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF064E3B)),
                     fontSize: 14,
                   ),
                 ),
@@ -389,7 +389,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(18),
             ),
             child: const Row(

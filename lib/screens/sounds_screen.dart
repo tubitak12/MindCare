@@ -28,7 +28,7 @@ class SoundsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: GridView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
@@ -48,7 +48,7 @@ class SoundsScreen extends StatelessWidget {
               onTap: () => _showSoundList(context, cat),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white, // İçerik beyaz
+                  color: Theme.of(context).cardColor, // İçerik arka planı
                   borderRadius: BorderRadius.circular(25),
                   // Kenarlık rengi ikon rengiyle aynı, hafif şeffaf
                   border:
@@ -92,9 +92,9 @@ class SoundsScreen extends StatelessWidget {
       builder: (context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.6,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           ),
           padding: const EdgeInsets.all(25),
           child: Column(
@@ -148,7 +148,7 @@ class SoundsScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isPlaying
                                 ? category['color'].withOpacity(0.06)
-                                : Colors.grey[50],
+                                : Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: ListTile(

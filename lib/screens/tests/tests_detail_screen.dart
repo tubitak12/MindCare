@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'tests_result_screen.dart';
 
@@ -26,7 +26,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
   Map<int, int> answersMap = {};
 
   final Color primaryGreen = const Color(0xFF10B981);
-  final Color darkText = const Color(0xFF064E3B);
+  Color get darkText => Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF064E3B);
   final Color mintBg = const Color(0xFFD1FAE5);
 
   // Bitki emojisini ilerlemeye göre belirleyen yardımcı fonksiyon
@@ -41,7 +41,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           widget.testTitle,
@@ -115,7 +115,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20),
               width: double.infinity,
-              color: Colors.white.withOpacity(0.5),
+              color: Theme.of(context).cardColor.withOpacity(0.5),
               child: Column(
                 children: [
                   AnimatedSwitcher(
@@ -214,7 +214,7 @@ class _TestsDetailScreenState extends State<TestsDetailScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? mintBg : Colors.white,
+          color: isSelected ? mintBg : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: isSelected ? primaryGreen : mintBg),
         ),

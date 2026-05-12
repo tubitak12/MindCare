@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'mood_selection_screen.dart';
 
 class InfoFlowScreen extends StatefulWidget {
@@ -38,7 +38,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -48,7 +48,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
@@ -147,12 +147,12 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
     return Column(
       key: const ValueKey(0),
       children: [
-        const Text(
+        Text(
           "Size Nasıl Yardımcı Olabiliriz?",
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF064E3B),
+            color: Theme.of(context).textTheme.bodyLarge?.color,
           ),
           textAlign: TextAlign.center,
         ),
@@ -221,8 +221,8 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
               scale: value,
               child: Container(
                 padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF0FDF4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -237,12 +237,12 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
 
         const SizedBox(height: 20),
 
-        const Text(
+        Text(
           "Harika! Hazırsınız",
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF064E3B),
+            color: Theme.of(context).textTheme.bodyLarge?.color,
           ),
         ),
 
@@ -251,7 +251,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0FDF4),
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(30),
           ),
           child: Text(
@@ -321,7 +321,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
       width: 100,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0FDF4).withValues(alpha: 0.5),
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
           color: const Color(0xFF10B981).withValues(alpha: 0.2),
@@ -333,9 +333,9 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
           const SizedBox(height: 5),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF064E3B),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
@@ -351,7 +351,7 @@ class _InfoFlowScreenState extends State<InfoFlowScreen>
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0FDF4),
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: const Color(0xFF10B981), size: 20),

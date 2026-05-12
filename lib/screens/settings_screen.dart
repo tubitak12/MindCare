@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
+import '../main.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -17,14 +19,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isPasswordResetLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _darkModeEnabled = themeNotifier.value == ThemeMode.dark;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Ayarlar', style: TextStyle(color: Color(0xFF064E3B))),
-        backgroundColor: Colors.white,
+        title: Text('Ayarlar', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF10B981)),
       ),
@@ -48,7 +56,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Göz yorgunluğunu azaltın',
               Icons.dark_mode_outlined,
               _darkModeEnabled,
-              (value) => setState(() => _darkModeEnabled = value),
+              (value) async {
+                setState(() => _darkModeEnabled = value);
+                themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('isDarkMode', value);
+              },
             ),
             _buildLanguageTile(),
           ]),
@@ -81,7 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -92,8 +105,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
-            backgroundColor: Color(0xFFF0FDF4),
+          CircleAvatar(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             radius: 30,
             child: Icon(Icons.person, color: Color(0xFF10B981), size: 35),
           ),
@@ -109,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 Text(
                   user?.email ?? 'email@example.com',
-                  style: const TextStyle(color: const Color(0xFF6B7280)),
+                  style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? const Color(0xFF6B7280)),
                 ),
               ],
             ),
@@ -270,7 +283,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSettingsGroup(String title, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -308,7 +321,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: Text(
         title,
         style: TextStyle(
-          color: isDestructive ? Colors.redAccent : const Color(0xFF064E3B),
+          color: isDestructive ? Colors.redAccent : Theme.of(context).textTheme.bodyLarge?.color,
         ),
       ),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),

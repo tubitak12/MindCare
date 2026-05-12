@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'tests_screen.dart';
 
@@ -8,7 +8,7 @@ class TestsCategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(0),
         child: SizedBox(),
@@ -52,7 +52,7 @@ class TestsCategoryScreen extends StatelessWidget {
 
                   return Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: const Color(0xFF10B981),

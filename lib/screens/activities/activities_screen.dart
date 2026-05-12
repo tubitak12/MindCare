@@ -50,7 +50,7 @@ class ActivitiesScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4), // Testlerle aynı arka plan
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: activities.length,
@@ -66,7 +66,7 @@ class ActivitiesScreen extends StatelessWidget {
 
           return Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: const Color(0xFF10B981), // Testlerle aynı border rengi
@@ -106,10 +106,10 @@ class ActivitiesScreen extends StatelessWidget {
                           children: [
                             Text(
                               title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: Colors.black87,
+                                color: Theme.of(context).textTheme.bodyLarge?.color,
                               ),
                             ),
                             const SizedBox(height: 6),

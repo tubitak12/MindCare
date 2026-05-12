@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'tests_detail_screen.dart';
 
@@ -16,10 +16,10 @@ class TestsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Kategori ekranındaki ile aynı renkler
     const Color primaryGreen = Color(0xFF10B981);
-    const Color darkText = Color(0xFF064E3B);
+    final Color? darkText = Theme.of(context).textTheme.bodyLarge?.color;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           categoryName,
@@ -66,7 +66,7 @@ class TestsScreen extends StatelessWidget {
               return Container(
                 // 🔹 KENARLIK BURADA AYARLANDI (Kategori ekranıyla aynı)
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: primaryGreen, // Mint Yeşil Kenarlık
@@ -113,7 +113,7 @@ class TestsScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   title,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 17,
                                     color: darkText,
