@@ -9,6 +9,7 @@ import 'daily_screen.dart';
 import 'analytics_screen.dart';
 import 'sounds_screen.dart';
 import 'chat_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -520,16 +521,84 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF0FDF4),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF10B981),
+        backgroundColor: const Color(0xFFF0FDF4),
         elevation: 0,
-        title: Text(
-          "Hoş Geldin, ${widget.userName}",
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 70,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(
+            color: const Color(0xFF10B981).withOpacity(0.2),
+            height: 1.0,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: Padding(
+          padding: const EdgeInsets.only(left: 4.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'İyi günler',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                widget.userName,
+                style: const TextStyle(
+                  color: Color(0xFF064E3B),
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          Center(
+            child: Text(
+              widget.userEmoji,
+              style: const TextStyle(fontSize: 32),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: const Color(0xFF10B981).withOpacity(0.3),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF10B981),
+                    size: 24,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(child: _getPage()),
       floatingActionButton: Container(
